@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="wrapper container">
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            {% if db == 'BD1.db'%}
+            <li><a href="/db_ucheb">Учебная литература</a></li>
+            <li class="active"><a href="/db_hudoz">Художественная литература</a></li>
+            {% else %}
+            <li class="active"><a href="/db_ucheb">Учебная литература</a></li>
+            <li><a href="/db_hudoz">Художественная литература</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            <li><a href="/index">На главную</a></li>
+            <li class="active"><a href="/addbook">Добавить книгу</a></li>
+            <li><a href="/deletebook">Удалить книгу</a></li>
+            <li><a href="/change">Изменить</a></li>
+            <li><a href="/find">Поиск</a></li>
+            <li><a href="/giving">Выдача</a></li>
+        </ul>
+    </nav>
+
+    <div class="row">
+        <form name="search" action="/add_message" method="post" class="form-inline form-search pull-right">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    {% if s['author'] == '' %}
+                    <th><label class="sr-only" for="searchInput0">Автор</label>
+                        <input class="form-control" id="searchInput0" type="text" name="author" placeholder="Автор">
+                    </th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput0">Автор</label>
+                        <input class="form-control" id="searchInput0" type="text" name="author" placeholder="Автор"
+                               value='{{s["author"]}}'>
+                    </th>
+                    {% endif %}
+
+                    {% if s['name'] == '' %}
+                    <th><label class="sr-only" for="searchInput1">Название</label>
+                        <input class="form-control" id="searchInput1" type="text" name="name" placeholder="Название">
+                    </th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput1">Название</label>
+                        <input class="form-control" id="searchInput1" type="text" name="name" placeholder="Название"
+                               value="{{s['name']}}">
+                    </th>
+                    {% endif %}
+
+                    {% if s['subject'] == '' %}
+                    <th><label class="sr-only" for="searchInput2">Предмет</label>
+                        <input class="form-control" id="searchInput2" type="text" name="subject" placeholder="Предмет">
+                    </th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput2">Предмет</label>
+                        <input class="form-control" id="searchInput2" type="text" name="subject" placeholder="Предмет" ,
+                               value="{{s['subject']}}">
+                    </th>
+                    {% endif %}
+
+                    {% if s['date'] == '' %}
+                    <th><label class="sr-only" for="searchInput3">Дата постановки на учет</label>
+                        <input class="form-control" id="searchInput3" type="date" name="date"
+                               placeholder="Дата постановки на учет"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput3">Дата постановки на учет</label>
+                        <input class="form-control" id="searchInput3" type="date" name="date"
+                               placeholder="Дата постановки на учет" value={{s['date']}}></th>
+                    {% endif %}
+
+                    {% if s['yeartown'] == '' %}
+                    <th><label class="sr-only" for="searchInput4">Год издания</label>
+                        <input class="form-control" id="searchInput4" type="text" name="yeartown"
+                               placeholder="Год издания"></th>
+                    {% else %}
+                     <th><label class="sr-only" for="searchInput4">Год издания</label>
+                        <input class="form-control" id="searchInput4" type="text" name="yeartown"
+                               placeholder="Год издания" value="{{s['yeartown']}}"></th>
+                    {% endif %}
+                </tr>
+                <tr>
+                    {% if s['number'] == '' %}
+                    <th><label class="sr-only" for="searchInput5">Номер издания</label>
+                        <input class="form-control" id="searchInput5" type="text" name="number"
+                               placeholder="Номер издания"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput5">Номер издания</label>
+                        <input class="form-control" id="searchInput5" type="text" name="number"
+                               placeholder="Номер издания" value={{s['number']}}></th>
+                    {% endif %}
+
+                    {% if s['quantity'] == '' %}
+                    <th><label class="sr-only" for="searchInput6">Количество</label>
+                        <input class="form-control" id="searchInput6" type="number" name="quantity"
+                               placeholder="Количество"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput6">Количество</label>
+                        <input class="form-control" id="searchInput6" type="number" name="quantity"
+                               placeholder="Количество" value={{s['quantity']}}></th>
+                    {% endif %}
+
+                     {% if s['price'] == '' %}
+                    <th><label class="sr-only" for="searchInput7">Цена</label>
+                        <input class="form-control" id="searchInput7" type="text" name="price" placeholder="Цена"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput7">Цена</label>
+                        <input class="form-control" id="searchInput7" type="text" name="price" placeholder="Цена"
+                         value={{s['price']}}></th>
+                    {% endif %}
+
+                    {% if s['notes'] == '' %}
+                    <th><label class="sr-only" for="searchInput8">Примечания</label>
+                        <input class="form-control" id="searchInput8" type="text" name="notes" placeholder="Примечания"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput8">Примечания</label>
+                        <input class="form-control" id="searchInput8" type="text" name="notes" placeholder="Примечания"
+                         value="{{s['notes']}}"></th>
+                    {% endif %}
+
+                    {% if s['clas'] == '' %}
+                    <th><label class="sr-only" for="searchInput9">Класс</label>
+                        <input class="form-control" id="searchInput9" type="text" name="clas" placeholder="Класс"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput8">Примечания</label>
+                        <input class="form-control" id="searchInput8" type="text" name="clas" placeholder="Примечания"
+                         value={{s['clas']}}></th>
+                    {% endif %}
+                </tr>
+                <tr>
+                    {% if s['decomission'] == '' %}
+                    <th><label class="sr-only" for="searchInput10">Акт выбытия</label>
+                        <input class="form-control" id="searchInput10" type="text" name="decomission"
+                               placeholder="Акт выбытия"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput10">Акт выбытия</label>
+                        <input class="form-control" id="searchInput10" type="text" name="decomission"
+                               placeholder="Акт выбытия" value={{s['decomission']}}></th>
+                    {% endif %}
+
+                    {% if s['numberinlist'] == '' %}
+                    <th><label class="sr-only" for="searchInput11">П/П</label>
+                        <input class="form-control" id="searchInput11" type="text" name="numberinlist"
+                               placeholder="П/П"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput11">П/П</label>
+                        <input class="form-control" id="searchInput11" type="text" name="numberinlist"
+                               placeholder="П/П" value={{s['numberinlist']}}></th>
+                    {% endif %}
+
+                    {% if s['publisher'] == '' %}
+                    <th><label class="sr-only" for="searchInput12">Издательство</label>
+                        <input class="form-control" id="searchInput12" type="text" name="publisher"
+                               placeholder="Издательство"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput12">Издательство</label>
+                        <input class="form-control" id="searchInput12" type="text" name="publisher"
+                               placeholder="Издательство" value="{{s['publisher']}}"></th>
+                    {% endif %}
+
+                    {% if s['set_1'] == '' %}
+                    <th><label class="sr-only" for="searchInput13">КСУ</label>
+                        <input class="form-control" id="searchInput13" type="text" name="set_1" placeholder="КСУ"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput13">КСУ</label>
+                        <input class="form-control" id="searchInput13" type="text" name="set_1" placeholder="КСУ"
+                         value={{s['set_1']}}></th>
+                    {% endif %}
+
+                    {% if s['consignment'] == '' %}
+                    <th><label class="sr-only" for="searchInput14">Накладная</label>
+                        <input class="form-control" id="searchInput14" type="text" name="consignment"
+                               placeholder="Накладная"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput14">Накладная</label>
+                        <input class="form-control" id="searchInput14" type="text" name="consignment"
+                               placeholder="Накладная"  value={{s['consignment']}}></th>
+                    {% endif %}
+                </tr>
+                <tr>
+                    {% if s['code'] == '' %}
+                    <th><label class="sr-only" for="searchInput17">Штрих-код</label>
+                        <input class="form-control" id="searchInput17" type="text" name="code"
+                               placeholder="Штрих-код"></th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput17">Штрих-код</label>
+                        <input class="form-control" id="searchInput17" type="text" name="code"
+                               placeholder="Штрих-код" value={{s['code']}}></th>
+                    {% endif %}
+                </tr>
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+                </thead>
+            </table>
+        </form>
+        <div><a style="color: rgb(182, 0, 12);">{{wrong}}</a></div>
+        <p>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Автор</th>
+                <th>Название</th>
+                <th>Предмет</th>
+                <th>Класс</th>
+                <th>Год издания</th>
+                <th>Издательство</th>
+                <th>Номер издания</th>
+                <th>Дата постановки на учет</th>
+                <th>Количество</th>
+                <th>Цена</th>
+                <th>Общая сумма</th>
+                <th>Накладная</th>
+                <th>П/П</th>
+                <th>КСУ</th>
+                <th>Акт выбытия</th>
+                <th>Примечания</th>
+                <th>Штрих-код</th>
+            </tr>
+            </thead>
+            <tbody>
+            {%for message in messages %}
+            <tr>
+                <th scope="row">{{message.id}}</th>
+                <td>{{message.author}}</td>
+                <td>{{message.name}}</td>
+                <td>{{message.subject}}</td>
+                <td>{{message.clas}}</td>
+                <td>{{message.yeartown}}</td>
+                <td>{{message.publisher}}</td>
+                <td>{{message.number}}</td>
+                <td>{{message.date}}</td>
+                <td>{{message.quantity}}</td>
+                <td>{{message.price}}</td>
+                <td>{{message.sum}}</td>
+                <td>{{message.consignment}}</td>
+                <td>{{message.numberinlist}}</td>
+                <td>{{message.set_1}}</td>
+                <td>{{message.decomission}}</td>
+                <td>{{message.notes}}</td>
+                <td>{{message.code}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<footer>
+
+</footer>
+{% endblock %}

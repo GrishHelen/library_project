@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="wrapper container">
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            {% if db == 'BD1.db'%}
+            <li><a href="/db_ucheb">Учебная литература</a></li>
+            <li class="active"><a href="/db_hudoz">Художественная литература</a></li>
+            {% else %}
+            <li class="active"><a href="/db_ucheb">Учебная литература</a></li>
+            <li><a href="/db_hudoz">Художественная литература</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="/index">На главную</a></li>
+            <li><a href="/addbook">Добавить книгу</a></li>
+            <li><a href="/deletebook">Удалить книгу</a></li>
+            <li><a href="/change">Изменить</a></li>
+            <li><a href="/find">Поиск</a></li>
+            <li><a href="/giving">Выдача</a></li>
+        </ul>
+    </nav>
+
+    <p>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Автор</th>
+            <th>Название</th>
+            <th>Предмет</th>
+            <th>Класс</th>
+            <th>Год издания</th>
+            <th>Издательство</th>
+            <th>Номер издания</th>
+            <th>Дата постановки на учет</th>
+            <th>Количество</th>
+            <th>Цена</th>
+            <th>Общая сумма</th>
+            <th>Накладная</th>
+            <th>П/П</th>
+            <th>КСУ</th>
+            <th>Акт выбытия</th>
+            <th>Примечания</th>
+            <th>Штрих-код</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%for message in show_all %}
+        <tr>
+            <th scope="row">{{message[0]}}</th>
+            <td>{{message[1]}}</td>
+            <td>{{message[2]}}</td>
+            <td>{{message[3]}}</td>
+            <td>{{message[10]}}</td>
+            <td>{{message[5]}}</td>
+            <td>{{message[13]}}</td>
+            <td>{{message[6]}}</td>
+            <td>{{message[4]}}</td>
+            <td>{{message[7]}}</td>
+            <td>{{message[8]}}</td>
+            <td>{{message[14]}}</td>
+            <td>{{message[16]}}</td>
+            <td>{{message[12]}}</td>
+            <td>{{message[15]}}</td>
+            <td>{{message[11]}}</td>
+            <td>{{message[9]}}</td>
+            <td>{{message[17]}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<footer>
+
+</footer>
+{% endblock %}

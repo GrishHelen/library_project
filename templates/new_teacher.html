@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Библиотека</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='../static/css/styles.css') }}" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Oswald:400,300" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<p></p>
+<div class="wrapper container">
+    <h1>Новый преподаватель</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+        <p>
+            {{ form.surname.label }}<br>
+            {{ form.surname(class="form-control") }}<br>
+            {% for error in form.surname.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(class="form-control") }}<br>
+            {% for error in form.name.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.father.label }}<br>
+            {{ form.father(class="form-control") }}<br>
+            {% for error in form.father.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+        <div><a style="font-size: 9pt; font-weight: 600; color: rgb(130, 130, 130)">Выберите должность*</a></div>
+        <select name="position" style="font-size: 9pt;">
+            <option disabled="disabled" selected="selected"></option>
+            <option value="dir">Директор</option>
+            <option value="zamdir">Заместитель директора</option>
+            <option value="bibl">Педагог-библиотекарь</option>
+            <option value="extra">Организатор дополнительного образования</option>
+            <option value="prim">Учитель начальных классов</option>
+            <option value="vospit">Воспитатель</option>
+            <option value="speech">Логопед</option>
+            <option value="psyco">Педагог-психолог</option>
+            <option value="izo">Учитель ИЗО</option>
+            <option value="music">Учитель музыки</option>
+            <option value="mxk">Учитель МХК</option>
+            <option value="obj">Учитель ОБЖ</option>
+            <option value="pe">Учитель физкультуры</option>
+            <option value="math">Учитель математики</option>
+            <option value="inf">Учитель информатики</option>
+            <option value="phys">Учитель физики</option>
+            <option value="ruslit">Учитель русского языка и литературы</option>
+            <option value="rus">Учитель русского языка</option>
+            <option value="geogr">Учитель географии</option>
+            <option value="bio">Учитель биологии</option>
+            <option value="chem">Учитель химии</option>
+            <option value="histobch">Учитель истории и обществознания</option>
+            <option value="obch">Учитель обществознания</option>
+            <option value="hist">Учитель истории</option>
+            <option value="eng">Учитель английского языка</option>
+            <option value="french">Учитель французского языка</option>
+            <option value="latin">Учитель латинского языка</option>
+            <option value="german">Учитель немецкого языка</option>
+            <option value="other">Другое</option>
+        </select>
+        </p>
+
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <div>Обязательные поля отмечены звездочкой (*)</div>
+        <div><a style="color: rgb(182, 0, 12); font-size: 11pt;">{{message}}</a></div>
+    </form>
+</div>
+</body>
+</html>

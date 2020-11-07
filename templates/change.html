@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="wrapper container">
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            {% if db == 'BD1.db'%}
+            <li><a href="/db_ucheb">Учебная литература</a></li>
+            <li class="active"><a href="/db_hudoz">Художественная литература</a></li>
+            {% else %}
+            <li class="active"><a href="/db_ucheb">Учебная литература</a></li>
+            <li><a href="/db_hudoz">Художественная литература</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            <li><a href="/index">На главную</a></li>
+            <li><a href="/addbook">Добавить книгу</a></li>
+            <li><a href="/deletebook">Удалить книгу</a></li>
+            <li class="active"><a href="/change">Изменить</a></li>
+            <li><a href="/find">Поиск</a></li>
+            <li><a href="/giving">Выдача</a></li>
+        </ul>
+    </nav>
+    <form name="search" action="/change_it" method="post" class="form-inline form-search pull-right">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th><label class="sr-only" for="searchInput0">Автор</label>
+                    <input class="form-control" id="searchInput0" type="text" name="author" placeholder="Автор"></th>
+                <th><label class="sr-only" for="searchInput1">Название</label>
+                    <input class="form-control" id="searchInput1" type="text" name="name" placeholder="Название"></th>
+                <th><label class="sr-only" for="searchInput2">Предмет</label>
+                    <input class="form-control" id="searchInput2" type="text" name="subject" placeholder="Предмет"></th>
+                <th><label class="sr-only" for="searchInput3">Дата постановки на учет</label>
+                    <input class="form-control" id="searchInput3" type="date" name="date"
+                           placeholder="Дата постановки на учет"></th>
+                <th><label class="sr-only" for="searchInput4">Год издания</label>
+                    <input class="form-control" id="searchInput4" type="text" name="yeartown" placeholder="Год издания">
+                </th>
+
+            </tr>
+            <tr>
+                <th><label class="sr-only" for="searchInput5">Номер издания</label>
+                    <input class="form-control" id="searchInput5" type="text" name="number" placeholder="Номер издания">
+                </th>
+                <th><label class="sr-only" for="searchInput6">Количество</label>
+                    <input class="form-control" id="searchInput6" type="number" name="quantity"
+                           placeholder="Количество"></th>
+                <th><label class="sr-only" for="searchInput7">Цена</label>
+                    <input class="form-control" id="searchInput7" type="text" name="price" placeholder="Цена"></th>
+                <th><label class="sr-only" for="searchInput8">Примечания</label>
+                    <input class="form-control" id="searchInput8" type="text" name="notes" placeholder="Примечания">
+                </th>
+                <th><label class="sr-only" for="searchInput9">Класс</label>
+                    <input class="form-control" id="searchInput9" type="text" name="clas" placeholder="Класс"></th>
+            </tr>
+            <tr>
+                <th><label class="sr-only" for="searchInput10">Акт выбытия</label>
+                    <input class="form-control" id="searchInput10" type="text" name="decomission"
+                           placeholder="Акт выбытия"></th>
+                <th><label class="sr-only" for="searchInput11">П/П</label>
+                    <input class="form-control" id="searchInput11" type="text" name="numberinlist" placeholder="П/П">
+                </th>
+                <th><label class="sr-only" for="searchInput12">Издательство</label>
+                    <input class="form-control" id="searchInput12" type="text" name="publisher"
+                           placeholder="Издательство"></th>
+                <th><label class="sr-only" for="searchInput13">КСУ</label>
+                    <input class="form-control" id="searchInput13" type="text" name="set_1" placeholder="КСУ"></th>
+                <th><label class="sr-only" for="searchInput14">Накладная</label>
+                    <input class="form-control" id="searchInput14" type="text" name="consignment"
+                           placeholder="Накладная"></th>
+            </tr>
+            <tr>
+                <th><label class="sr-only" for="searchInput17">Штрих-код</label>
+                    <input class="form-control" id="searchInput17" type="text" name="code"
+                           placeholder="Штрих-код"></th>
+            </tr>
+            <div class="input-group-btn">
+                <label class="sr-only" for="searchInput15"> № </label>
+                <input class="form-control" id="searchInput15" type="text" name="id" placeholder="№">
+                <button type="submit" class="btn btn-primary">Изменить</button>
+            </div>
+            </thead>
+        </table>
+    </form>
+    <p>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>№</th>
+            <th>Автор</th>
+            <th>Название</th>
+            <th>Предмет</th>
+            <th>Класс</th>
+            <th>Год издания</th>
+            <th>Издательство</th>
+            <th>Номер издания</th>
+            <th>Дата постановки на учет</th>
+            <th>Количество</th>
+            <th>Цена</th>
+            <th>Общая сумма</th>
+            <th>Накладная</th>
+            <th>П/П</th>
+            <th>КСУ</th>
+            <th>Акт выбытия</th>
+            <th>Примечания</th>
+            <th>Штрих-код</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%for message in changing %}
+        <tr>
+            <th scope="row">{{message[0]}}</th>
+            <td>{{message[1]}}</td>
+            <td>{{message[2]}}</td>
+            <td>{{message[3]}}</td>
+            <td>{{message[10]}}</td>
+            <td>{{message[5]}}</td>
+            <td>{{message[13]}}</td>
+            <td>{{message[6]}}</td>
+            <td>{{message[4]}}</td>
+            <td>{{message[7]}}</td>
+            <td>{{message[8]}}</td>
+            <td>{{message[14]}}</td>
+            <td>{{message[16]}}</td>
+            <td>{{message[12]}}</td>
+            <td>{{message[15]}}</td>
+            <td>{{message[11]}}</td>
+            <td>{{message[9]}}</td>
+            <td>{{message[17]}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+<footer>
+</footer>
+{% endblock %}

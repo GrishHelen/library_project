@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="wrapper container">
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            {% if db == 'BD1.db'%}
+            <li><a href="/db_ucheb">Учебная литература</a></li>
+            <li class="active"><a href="/db_hudoz">Художественная литература</a></li>
+            {% else %}
+            <li class="active"><a href="/db_ucheb">Учебная литература</a></li>
+            <li><a href="/db_hudoz">Художественная литература</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            <li><a href="/index">На главную</a></li>
+            <li><a href="/addbook">Добавить книгу</a></li>
+            <li><a href="/deletebook">Удалить книгу</a></li>
+            <li><a href="/change">Изменить</a></li>
+            <li class="active"><a href="/find">Поиск</a></li>
+            <li><a href="/giving">Выдача</a></li>
+        </ul>
+    </nav>
+
+    <div class="row">
+        <form id="form1" name="search" action="/find_it" method="post" class="form-inline form-search pull-right">
+            <div class="input-group">
+                <label class="sr-only" for="form1">Название столбца</label>
+                <select class="form-control" form="form1" name="stolb">
+                    <option value="id">№</option>
+                    <option value="author">Автор</option>
+                    <option value="name">Название</option>
+                    <option value="subject">Предмет</option>
+                    <option value="date">Дата постановки на учет</option>
+                    <option value="yeartown">Год издания</option>
+                    <option value="number">Номер издания</option>
+                    <option value="quantity">Количество</option>
+                    <option value="price">Цена</option>
+                    <option value="notes">Примечания</option>
+                    <option value="class">Класс</option>
+                    <option value="decomission">Акт выбытия</option>
+                    <option value="numberinlist">П/П</option>
+                    <option value="publisher">Издательство</option>
+                    <option value="sum">Общая сумма</option>
+                    <option value="set_1">КСУ</option>
+                    <option value="consignment">Накладная</option>
+                    <option value="code">Штрих-код</option>
+                </select>
+                <label class="sr-only" for="searchInput2">Что найти</label>
+                <input class="form-control" id="searchInput2" type="text" name="type" placeholder="Что найти">
+                <br><br><br>
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-primary">Найти</button>
+                </div>
+            </div>
+        </form>
+        <p>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>№</th>
+                <th>Автор</th>
+                <th>Название</th>
+                <th>Предмет</th>
+                <th>Класс</th>
+                <th>Год издания</th>
+                <th>Издательство</th>
+                <th>Номер издания</th>
+                <th>Дата постановки на учет</th>
+                <th>Количество</th>
+                <th>Цена</th>
+                <th>Общая сумма</th>
+                <th>Накладная</th>
+                <th>П/П</th>
+                <th>КСУ</th>
+                <th>Акт выбытия</th>
+                <th>Примечания</th>
+                <th>Штрих-код</th>
+            </tr>
+            </thead>
+            <tbody>
+            {%for message in found %}
+            <tr>
+                <th scope="row">{{message[0]}}</th>
+                <td>{{message[1]}}</td>
+                <td>{{message[2]}}</td>
+                <td>{{message[3]}}</td>
+                <td>{{message[10]}}</td>
+                <td>{{message[5]}}</td>
+                <td>{{message[13]}}</td>
+                <td>{{message[6]}}</td>
+                <td>{{message[4]}}</td>
+                <td>{{message[7]}}</td>
+                <td>{{message[8]}}</td>
+                <td>{{message[14]}}</td>
+                <td>{{message[16]}}</td>
+                <td>{{message[12]}}</td>
+                <td>{{message[15]}}</td>
+                <td>{{message[11]}}</td>
+                <td>{{message[9]}}</td>
+                <td>{{message[17]}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<footer>
+</footer>
+{% endblock %}

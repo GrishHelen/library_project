@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="wrapper container">
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            {% if db == 'BD1.db'%}
+            <li><a href="/db_ucheb">Учебная литература</a></li>
+            <li class="active"><a href="/db_hudoz">Художественная литература</a></li>
+            {% else %}
+            <li class="active"><a href="/db_ucheb">Учебная литература</a></li>
+            <li><a href="/db_hudoz">Художественная литература</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <h1>
+    <div>Такого издательства в списке нет</div></h1>
+    <p>
+    <form name="search" action="" method="post" class="form-inline form-search pull-right">
+                <div class="input-group-btn">
+						<button type="submit" formaction= "/yes_add" class="btn btn-primary">Все равно добавить</button>
+                </div>
+                <div class="input-group-btn">
+						<button type="submit" formaction="/not_add" class="btn btn-primary">Не добавлять</button>
+                </div>
+    </form>
+</div>
+{% endblock %}
