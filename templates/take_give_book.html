@@ -13,7 +13,7 @@
 <body>
 <p></p>
 <div class="wrapper container">
-    <h1>Новый преподаватель</h1>
+    <h1>{{header}}</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {{ form.csrf_token }}
@@ -28,9 +28,9 @@
         </p>
 
         <p>
-            {{ form.person.label }}<br>
-            {{ form.person(class="form-control") }}<br>
-            {% for error in form.person.errors %}
+            {{ form.person_code.label }}<br>
+            {{ form.person_code(class="form-control") }}<br>
+            {% for error in form.person_code.errors %}
         <div class="alert alert-danger" role="alert">
             {{ error }}
         </div>

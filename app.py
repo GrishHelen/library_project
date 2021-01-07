@@ -1,5 +1,7 @@
 import datetime
 import sqlite3
+import os
+import urllib
 from collections import namedtuple
 from flask import Flask, render_template, redirect, url_for, request, g
 from data.forms import NewTeacher, NewStudent, TakeBook, GiveBook
@@ -7,7 +9,16 @@ from data.db_session import create_session, global_init
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret_key'
-
+PROFS = {"dir": "Директор", "zamdir": "Заместитель директора", "bibl": "Педагог-библиотекарь",
+         "extra": "Организатор дополнительного образования", "prim": "Учитель начальных классов",
+         "vospit": "Воспитатель", "speech": "Логопед", "psyco": "Педагог-психолог", "izo": "Учитель ИЗО",
+         "music": "Учитель музыки", "mxk": "Учитель МХК", "obj": "Учитель ОБЖ", "pe": "Учитель физкультуры",
+         "math": "Учитель математики", "inf": "Учитель информатики", "phys": "Учитель физики",
+         "ruslit": "Учитель русского языка и литературы", "rus": "Учитель русского языка",
+         "geogr": "Учитель географии", "bio": "Учитель биологии", "chem": "Учитель химии",
+         "histobch": "Учитель истории и обществознания", "obch": "Учитель обществознания", "hist": "Учитель истории",
+         "eng": "Учитель английского языка", "french": "Учитель французского языка", "student": "Ученик",
+         "latin": "Учитель латинского языка", "german": "Учитель немецкого языка", "other": "Другое"}
 Message = namedtuple('Message', "id author name subject date yeartown number quantity price notes clas "
                                 "decomission numberinlist publisher sum set_1 consignment code")
 messages = []
@@ -287,12 +298,23 @@ def change_it():
 @app.route("/find_it", methods=["POST"])
 def find_it():
     global found, database
+    dict = {'id': 0, 'author': 1, 'name': 2, 'subject': 3, 'date': 4, 'yeartown': 5, 'number': 6, 'quantity': 7,
+            'price': 8, 'notes': 9, 'class': 10, 'clas': 10, 'decomission': 11, 'numberlist': 12, 'publisher': 13, 'sum set_1': 14,
+            'consignment': 15, 'code': 16}
     name = request.form["stolb"]
-    type = request.form["type"]
+    typ = str(request.form["type"]).lower()
+    name_1 = dict[name]
     con = sqlite3.connect(database)
     cursoro = con.cursor()
-    found = cursoro.execute("SELECT * FROM books where {}='{}'".format(name, type)).fetchall()
-    con.commit()
+    all = cursoro.execute(f"SELECT * FROM books").fetchall()
+    found = []
+    for i in all:
+        x = str(i[name_1]).lower()
+        if x == typ or typ in x or x in typ:
+            found.append(i)
+        else:
+            if x == typ:
+                found.append(i)
     con.close()
     return redirect(url_for("find"))
 
@@ -302,7 +324,6 @@ def giving():
     con = sqlite3.connect(database)
     cursoro = con.cursor()
     spisok = [list(i) for i in cursoro.execute('SELECT * from history').fetchall()]
-    print(spisok)
     for sp in spisok:
         book = cursoro.execute(f'SELECT name from books WHERE code="{sp[1]}"').fetchall()
         if len(book) == 0:
@@ -312,14 +333,14 @@ def giving():
         sp.insert(2, book)
     cursoro = sqlite3.connect('people.db').cursor()
     for sp in spisok:
-        fio = cursoro.execute(f'SELECT fio from numbers WHERE id="{sp[3]}"').fetchone()
+        fio = cursoro.execute(f'SELECT fio from numbers WHERE code="{sp[3]}"').fetchone()
         fio = fio[0].split('_')
         if fio[-1] == '-':
             fio.remove('-')
         fio = ' '.join(fio)
-        sp.insert(4, fio)
-    print(spisok)
-    return render_template('giving.html', db=database, history=spisok)
+        sp[4] = fio
+        sp[-1] = '.'.join(sp[-1].split('-')[::-1])
+    return render_template('giving.html', db=database, history=spisok[::-1])
 
 
 @app.route('/new_teacher', methods=['GET', 'POST'])
@@ -339,17 +360,30 @@ def new_teacher():
         fio = form.surname.data + '_' + form.name.data + '_' + form.father.data
         id_new = form.name.data[0] + '.' + form.father.data[0] + '.' + form.surname.data + '_' + \
                  form.position.data
+        code = form.code.data
         con = sqlite3.connect('people.db')
         cursoro = con.cursor()
+        sp = list(cursoro.execute(f'SELECT * FROM numbers WHERE code="{code}"').fetchall())
+        if len(sp) > 0:
+            return render_template('new_teacher.html', form=form, db=database,
+                                   message='Человек с таким номером пропускной карточки уже есть. '
+                                           'Проверьте корректность введенных данных')
         sp = list(cursoro.execute('SELECT id FROM numbers WHERE id LIKE "{}%"'.format(id_new)).fetchall())
         if len(sp) == 1:
             id_new += '_1'
         elif len(sp) > 1:
             id_new += '_' + str(sorted([int(i.split('_')[-1]) for i in sp])[-1] + 1)
         cursoro.execute(
-            f'INSERT INTO numbers (id, fio, position) VALUES ("{id_new}", "{fio}", "{form.position.data}")')
+            f'INSERT INTO numbers (id, fio, position, code) VALUES ("{id_new}", "{fio}", "{form.position.data}", {code})')
+        url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
+              f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+              f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+        filename = f'people_codes/{code}.jpg'
+        img = urllib.request.urlopen(url).read()
+        with open(filename, 'wb') as file:
+            file.write(img)
         con.commit()
-        return redirect('/giving')
+        return redirect(f'/person_page/{code}')
 
 
 @app.route('/new_student', methods=['GET', 'POST'])
@@ -375,69 +409,196 @@ def new_student():
         year -= int(form.clas.data)
         id_new = form.name.data[0] + '.' + form.father.data[0] + '.' + form.surname.data + '_' + \
                  str(year)
+        code = form.code.data
         con = sqlite3.connect('people.db')
         cursoro = con.cursor()
+        sp = list(cursoro.execute(f'SELECT * FROM numbers WHERE code="{code}"').fetchall())
+        if len(sp) > 0:
+            return render_template('new_teacher.html', form=form, db=database,
+                                   message='Человек с таким номером пропускной карточки уже есть. '
+                                           'Проверьте корректность введенных данных')
         sp = list(cursoro.execute('SELECT id FROM numbers WHERE id LIKE "{}%"'.format(id_new)).fetchall())
         if len(sp) == 1:
             id_new += '_1'
         elif len(sp) > 1:
             id_new += '_' + str(sorted([int(i.split('_')[-1]) for i in sp])[-1] + 1)
         cursoro.execute(
-            f'INSERT INTO numbers (id, fio, position) VALUES ("{id_new}", "{fio}", "student")')
+            f'INSERT INTO numbers (id, fio, position, code) VALUES ("{id_new}", "{fio}", "student", {code})')
+        url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
+              f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+              f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+        filename = f'people_codes/{code}.jpg'
+        img = urllib.request.urlopen(url).read()
+        with open(filename, 'wb') as file:
+            file.write(img)
         con.commit()
-        return redirect('/giving')
+        return redirect(f'/person_page/{code}')
 
 
 @app.route('/give_book', methods=['GET', 'POST'])
 def give_book():
+    header = 'Выдать книгу'
     form = GiveBook()
     if request.method == 'GET':
-        return render_template('take_give_book.html', form=form, db=database, message='')
+        return render_template('take_give_book.html', form=form, db=database, message='', header=header)
     if form.is_submitted():
-        if str(form.person.data).strip() == '' or form.person.data is None:
-            return render_template('take_give_book.html', form=form, db=database, message='Введите ID человека')
+        if str(form.person_code.data).strip() == '' or form.person_code.data is None:
+            return render_template('take_give_book.html', form=form, db=database,
+                                   message='Введите номер пропусконой карточки человека')
         if str(form.book.data).strip() == '' or form.book.data is None:
             return render_template('take_give_book.html', form=form, db=database, message='Введите штрих-код книги')
         con = sqlite3.connect('people.db')
         cursoro = con.cursor()
-        p = list(cursoro.execute('SELECT * FROM numbers WHERE id LIKE "{}%"'.format(form.person.data)).fetchall())
+        p = list(
+            cursoro.execute('SELECT * FROM numbers WHERE code={}'.format(form.person_code.data)).fetchall())
         if len(p) == 0:
             return render_template('take_give_book.html', form=form, db=database,
                                    message='Такого человека нет в базе данных')
+        fio = p[0][2]
         today = datetime.datetime.date(datetime.datetime.now())
         con = sqlite3.connect(database)
         cursoro = con.cursor()
         cursoro.execute(
-            f'INSERT INTO history (person, book, action, date) VALUES ("{form.person.data}", "{form.book.data}", '
-            f'"выдать", "{today}")')
+            f'INSERT INTO history (person_fio, person_code, book, action, date) VALUES ("{fio}", '
+            f'{form.person_code.data}, "{form.book.data}", "выдать", "{today}")')
         con.commit()
         return redirect('/giving')
 
 
 @app.route('/take_book', methods=['GET', 'POST'])
 def take_book():
+    header = 'Принять книгу'
     form = TakeBook()
     if request.method == 'GET':
-        return render_template('take_give_book.html', form=form, db=database, message='')
+        return render_template('take_give_book.html', form=form, db=database, message='', header=header)
     if form.is_submitted():
-        if str(form.person.data).strip() == '' or form.person.data is None:
-            return render_template('take_give_book.html', form=form, db=database, message='Введите ID человека')
+        if str(form.person_code.data).strip() == '' or form.person_code.data is None:
+            return render_template('take_give_book.html', form=form, db=database,
+                                   message='Введите номер пропусконой карточки человека')
         if str(form.book.data).strip() == '' or form.book.data is None:
             return render_template('take_give_book.html', form=form, db=database, message='Введите штрих-код книги')
         con = sqlite3.connect('people.db')
         cursoro = con.cursor()
-        p = list(cursoro.execute('SELECT * FROM numbers WHERE id LIKE "{}%"'.format(form.person.data)).fetchall())
+        p = list(cursoro.execute('SELECT * FROM numbers WHERE code={}'.format(form.person_code.data)).fetchall())
         if len(p) == 0:
             return render_template('take_give_book.html', form=form, db=database,
                                    message='Такого человека нет в базе данных')
+        fio = p[0][2]
         today = datetime.datetime.date(datetime.datetime.now())
         con = sqlite3.connect(database)
         cursoro = con.cursor()
         cursoro.execute(
-            f'INSERT INTO history (person, book, action, date) VALUES ("{form.person.data}", "{form.book.data}", '
-            f'"принять", "{today}")')
+            f'INSERT INTO history (person_fio, person_code, book, action, date) VALUES ("{fio}", '
+            f'{form.person_code.data}, "{form.book.data}", "принять", "{today}")')
         con.commit()
         return redirect('/giving')
+
+
+@app.route('/person_page/<pers_code>', methods=['GET', 'POST'])
+def person_page(pers_code):
+    con = sqlite3.connect('people.db')
+    cursoro = con.cursor()
+    p = cursoro.execute(f'SELECT * FROM numbers WHERE code={pers_code}').fetchall()
+    if len(p) == 0:
+        return render_template('any_error.html', err=f'Не удалось найти пользователя с кодом {pers_code}')
+    id, pos, fio, code = p[0]
+    position = PROFS[pos]
+    fio = ' '.join(fio.split('_'))
+    url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
+          f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+          f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+    return render_template('person_page.html', id=id, position=position, fio=fio, code=code, img=url)
+
+
+@app.route('/student_change/<pers_code>', methods=['GET', 'POST'])
+def student_change(pers_code):
+    con = sqlite3.connect('people.db')
+    cursoro = con.cursor()
+    p = list(cursoro.execute(f'SELECT * FROM numbers WHERE code={pers_code}').fetchall())
+    if len(p) == 0:
+        return render_template('any_error.html', err='Такого человека нет в базе данных')
+    id, position, fio, code = p[0]
+    if position != 'student':
+        return redirect(f'/teacher_change/{pers_code}')
+
+    form = NewStudent()
+    if request.method == "GET":
+        surname, name, father = fio.split('_')
+        form.surname.data = surname
+        form.name.data = name
+        form.father.data = father
+        form.code.data = code
+        now = datetime.datetime.now()
+        year = now.year
+        if now.month >= 6:
+            year += 1
+        clas = year - int(id.split('_')[-1])
+        form.clas.data = clas
+        return render_template('new_student.html', form=form, db=database, message='')
+    if request.method == "POST":
+        if str(form.father.data).strip() == '' or form.father.data is None:
+            form.father.data = '-'
+        now = datetime.datetime.now()
+        year = now.year
+        if now.month >= 6:
+            year += 1
+        year -= int(form.clas.data)
+        id = form.name.data[0] + '.' + form.father.data[0] + '.' + form.surname.data + '_' + str(year)
+        fio = form.name.data + '_' + form.father.data + '_' + form.surname.data
+        cursoro.execute(f"UPDATE numbers SET id='{id}', fio='{fio}', code={form.code.data} WHERE code={pers_code}")
+        con.commit()
+        if pers_code != form.code.data:
+            os.remove(f'people_codes/{pers_code}.jpg')
+            url = f'https://barcode.tec-it.com/barcode.ashx?data={form.code.data}&code=&multiplebarcodes=false&' \
+                  f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+                  f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+            filename = f'people_codes/{form.code.data}.jpg'
+            img = urllib.request.urlopen(url).read()
+            with open(filename, 'wb') as file:
+                file.write(img)
+        return redirect(f'/person_page/{form.code.data}')
+
+
+@app.route('/teacher_change/<pers_code>', methods=['GET', 'POST'])
+def teacher_change(pers_code):
+    con = sqlite3.connect('people.db')
+    cursoro = con.cursor()
+    p = list(cursoro.execute(f'SELECT * FROM numbers WHERE code={pers_code}').fetchall())
+    if len(p) == 0:
+        return render_template('any_error.html', err='Такого человека нет в базе данных')
+    id, position, fio, code = p[0]
+    if position == 'student':
+        return redirect(f'/student_change/{pers_code}')
+
+    form = NewTeacher()
+    if request.method == "GET":
+        id, position, fio, code = p[0]
+        surname, name, father = fio.split('_')
+        form.surname.data = surname
+        form.name.data = name
+        form.father.data = father
+        form.code.data = code
+        form.position.data = position
+
+        return render_template('new_teacher.html', form=form, db=database, message='')
+    if request.method == "POST":
+        if str(form.father.data).strip() == '' or form.father.data is None:
+            form.father.data = '-'
+        id = form.name.data[0] + '.' + form.father.data[0] + '.' + form.surname.data + '_' + form.position.data
+        fio = form.name.data + '_' + form.father.data + '_' + form.surname.data
+        cursoro.execute(f"UPDATE numbers SET id='{id}', fio='{fio}', code={form.code.data}, "
+                        f"position='{form.position.data}' WHERE code={pers_code}")
+        con.commit()
+        if pers_code != form.code.data:
+            os.remove(f'people_codes/{pers_code}.jpg')
+            url = f'https://barcode.tec-it.com/barcode.ashx?data={form.code.data}&code=&multiplebarcodes=false&' \
+                  f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+                  f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+            filename = f'people_codes/{form.code.data}.jpg'
+            img = urllib.request.urlopen(url).read()
+            with open(filename, 'wb') as file:
+                file.write(img)
+        return redirect(f'/person_page/{form.code.data}')
 
 
 if __name__ == "__main__":

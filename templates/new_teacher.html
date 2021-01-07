@@ -13,7 +13,7 @@
 <body>
 <p></p>
 <div class="wrapper container">
-    <h1>Новый преподаватель</h1>
+    <h1>Преподаватель</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         {{ form.csrf_token }}
@@ -48,39 +48,169 @@
         </p>
 
         <p>
-        <div><a style="font-size: 9pt; font-weight: 600; color: rgb(130, 130, 130)">Выберите должность*</a></div>
+        <div><a style="font-size: 9pt; font-weight: 600; color: rgb(130, 130, 130)">Должность*</a></div>
         <select name="position" style="font-size: 9pt;">
+            {% if form.position.data == "" %}
             <option disabled="disabled" selected="selected"></option>
-            <option value="dir">Директор</option>
-            <option value="zamdir">Заместитель директора</option>
-            <option value="bibl">Педагог-библиотекарь</option>
-            <option value="extra">Организатор дополнительного образования</option>
-            <option value="prim">Учитель начальных классов</option>
-            <option value="vospit">Воспитатель</option>
-            <option value="speech">Логопед</option>
-            <option value="psyco">Педагог-психолог</option>
-            <option value="izo">Учитель ИЗО</option>
-            <option value="music">Учитель музыки</option>
-            <option value="mxk">Учитель МХК</option>
-            <option value="obj">Учитель ОБЖ</option>
-            <option value="pe">Учитель физкультуры</option>
-            <option value="math">Учитель математики</option>
-            <option value="inf">Учитель информатики</option>
-            <option value="phys">Учитель физики</option>
-            <option value="ruslit">Учитель русского языка и литературы</option>
-            <option value="rus">Учитель русского языка</option>
-            <option value="geogr">Учитель географии</option>
-            <option value="bio">Учитель биологии</option>
-            <option value="chem">Учитель химии</option>
-            <option value="histobch">Учитель истории и обществознания</option>
-            <option value="obch">Учитель обществознания</option>
-            <option value="hist">Учитель истории</option>
-            <option value="eng">Учитель английского языка</option>
-            <option value="french">Учитель французского языка</option>
-            <option value="latin">Учитель латинского языка</option>
-            <option value="german">Учитель немецкого языка</option>
-            <option value="other">Другое</option>
+            {% else %}
+            <option disabled="disabled"></option>
+            {% endif %}
+            {% if form.position.data == 'dir' %}
+                <option value='dir' selected='selected'>Директор</option>
+            {% else %}
+                <option value='dir'>Директор</option>
+            {% endif %}
+            {% if form.position.data == 'zamdir' %}
+                <option value='zamdir' selected='selected'>Заместитель директора</option>
+            {% else %}
+                <option value='zamdir'>Заместитель директора</option>
+            {% endif %}
+            {% if form.position.data == 'bibl' %}
+                <option value='bibl' selected='selected'>Педагог-библиотекарь</option>
+            {% else %}
+                <option value='bibl'>Педагог-библиотекарь</option>
+            {% endif %}
+            {% if form.position.data == 'extra' %}
+                <option value='extra' selected='selected'>Организатор дополнительного образования</option>
+            {% else %}
+                <option value='extra'>Организатор дополнительного образования</option>
+            {% endif %}
+            {% if form.position.data == 'prim' %}
+                <option value='prim' selected='selected'>Учитель начальных классов</option>
+            {% else %}
+                <option value='prim'>Учитель начальных классов</option>
+            {% endif %}
+            {% if form.position.data == 'vospit' %}
+                <option value='vospit' selected='selected'>Воспитатель</option>
+            {% else %}
+                <option value='vospit'>Воспитатель</option>
+            {% endif %}
+            {% if form.position.data == 'speech' %}
+                <option value='speech' selected='selected'>Логопед</option>
+            {% else %}
+                <option value='speech'>Логопед</option>
+            {% endif %}
+            {% if form.position.data == 'psyco' %}
+                <option value='psyco' selected='selected'>Педагог-психолог</option>
+            {% else %}
+                <option value='psyco'>Педагог-психолог</option>
+            {% endif %}
+            {% if form.position.data == 'izo' %}
+                <option value='izo' selected='selected'>Учитель ИЗО</option>
+            {% else %}
+                <option value='izo'>Учитель ИЗО</option>
+            {% endif %}
+            {% if form.position.data == 'music' %}
+                <option value='music' selected='selected'>Учитель музыки</option>
+            {% else %}
+                <option value='music'>Учитель музыки</option>
+            {% endif %}
+            {% if form.position.data == 'mxk' %}
+                <option value='mxk' selected='selected'>Учитель МХК</option>
+            {% else %}
+                <option value='mxk'>Учитель МХК</option>
+            {% endif %}
+            {% if form.position.data == 'obj' %}
+                <option value='obj' selected='selected'>Учитель ОБЖ</option>
+            {% else %}
+                <option value='obj'>Учитель ОБЖ</option>
+            {% endif %}
+            {% if form.position.data == 'pe' %}
+                <option value='pe' selected='selected'>Учитель физкультуры</option>
+            {% else %}
+                <option value='pe'>Учитель физкультуры</option>
+            {% endif %}
+            {% if form.position.data == 'math' %}
+                <option value='math' selected='selected'>Учитель математики</option>
+            {% else %}
+                <option value='math'>Учитель математики</option>
+            {% endif %}
+            {% if form.position.data == 'inf' %}
+                <option value='inf' selected='selected'>Учитель информатики</option>
+            {% else %}
+                <option value='inf'>Учитель информатики</option>
+            {% endif %}
+            {% if form.position.data == 'phys' %}
+                <option value='phys' selected='selected'>Учитель физики</option>
+            {% else %}
+                <option value='phys'>Учитель физики</option>
+            {% endif %}
+            {% if form.position.data == 'ruslit' %}
+                <option value='ruslit' selected='selected'>Учитель русского языка и литературы</option>
+            {% else %}
+                <option value='ruslit'>Учитель русского языка и литературы</option>
+            {% endif %}
+            {% if form.position.data == 'rus' %}
+                <option value='rus' selected='selected'>Учитель русского языка</option>
+            {% else %}
+                <option value='rus'>Учитель русского языка</option>
+            {% endif %}
+            {% if form.position.data == 'geogr' %}
+                <option value='geogr' selected='selected'>Учитель географии</option>
+            {% else %}
+                <option value='geogr'>Учитель географии</option>
+            {% endif %}
+            {% if form.position.data == 'bio' %}
+                <option value='bio' selected='selected'>Учитель биологии</option>
+            {% else %}
+                <option value='bio'>Учитель биологии</option>
+            {% endif %}
+            {% if form.position.data == 'chem' %}
+                <option value='chem' selected='selected'>Учитель химии</option>
+            {% else %}
+                <option value='chem'>Учитель химии</option>
+            {% endif %}
+            {% if form.position.data == 'histobch' %}
+                <option value='histobch' selected='selected'>Учитель истории и обществознания</option>
+            {% else %}
+                <option value='histobch'>Учитель истории и обществознания</option>
+            {% endif %}
+            {% if form.position.data == 'obch' %}
+                <option value='obch' selected='selected'>Учитель обществознания</option>
+            {% else %}
+                <option value='obch'>Учитель обществознания</option>
+            {% endif %}
+            {% if form.position.data == 'hist' %}
+                <option value='hist' selected='selected'>Учитель истории</option>
+            {% else %}
+                <option value='hist'>Учитель истории</option>
+            {% endif %}
+            {% if form.position.data == 'eng' %}
+                <option value='eng' selected='selected'>Учитель английского языка</option>
+            {% else %}
+                <option value='eng'>Учитель английского языка</option>
+            {% endif %}
+            {% if form.position.data == 'french' %}
+                <option value='french' selected='selected'>Учитель французского языка</option>
+            {% else %}
+                <option value='french'>Учитель французского языка</option>
+            {% endif %}
+            {% if form.position.data == 'latin' %}
+                <option value='latin' selected='selected'>Учитель латинского языка</option>
+            {% else %}
+                <option value='latin'>Учитель латинского языка</option>
+            {% endif %}
+            {% if form.position.data == 'german' %}
+                <option value='german' selected='selected'>Учитель немецкого языка</option>
+            {% else %}
+                <option value='german'>Учитель немецкого языка</option>
+            {% endif %}
+            {% if form.position.data == 'other' %}
+                <option value='other' selected='selected'>Другое</option>
+            {% else %}
+                <option value='other'>Другое</option>
+            {% endif %}
         </select>
+        </p>
+
+        <p>
+            {{ form.code.label }}<br>
+            {{ form.code(class="form-control") }}<br>
+            {% for error in form.code.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
         </p>
 
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>

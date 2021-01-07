@@ -10,28 +10,30 @@ from flask_login import UserMixin
 
 
 class NewTeacher(FlaskForm):
-    surname = StringField('Введите фамилию*', validators=[DataRequired()])
-    name = StringField('Введите имя*', validators=[DataRequired()])
-    father = StringField('Введите отчество')
-    position = StringField('Выберите должность*', validators=[DataRequired()])
-    submit = SubmitField('Добавить')
+    surname = StringField('Фамилия*', validators=[DataRequired()])
+    name = StringField('Имя*', validators=[DataRequired()])
+    father = StringField('Отчество')
+    position = StringField('Должность*', validators=[DataRequired()])
+    code = IntegerField('Номер пропускной карточки*', validators=[DataRequired()])
+    submit = SubmitField('Сохранить')
 
 
 class NewStudent(FlaskForm):
-    surname = StringField('Введите фамилию*', validators=[DataRequired()])
-    name = StringField('Введите имя*', validators=[DataRequired()])
-    father = StringField('Введите отчество')
+    surname = StringField('Фамилия*', validators=[DataRequired()])
+    name = StringField('Имя*', validators=[DataRequired()])
+    father = StringField('Отчество')
     clas = IntegerField('В каком Вы классе?*', validators=[DataRequired()])
-    submit = SubmitField('Добавить')
+    code = IntegerField('Номер пропускной карточки*', validators=[DataRequired()])
+    submit = SubmitField('Сохранить')
 
 
 class GiveBook(FlaskForm):
-    book = StringField('Введите штрих-код книги*', validators=[DataRequired()])
-    person = StringField('Введите ID человека*', validators=[DataRequired()])
+    book = StringField('Штрих-код книги*', validators=[DataRequired()])
+    person_code = IntegerField('Номер пропускной карточки человека*', validators=[DataRequired()])
     submit = SubmitField('Выдать')
 
 
 class TakeBook(FlaskForm):
-    book = StringField('Введите штрих-код книги*', validators=[DataRequired()])
-    person = StringField('Введите ID человека*', validators=[DataRequired()])
+    book = StringField('Штрих-код книги*', validators=[DataRequired()])
+    person_code = IntegerField('Номер пропускной карточки человека*', validators=[DataRequired()])
     submit = SubmitField('Принять')
