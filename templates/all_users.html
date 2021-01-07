@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="wrapper container">
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            <li><a href="/db_ucheb">Учебная литература</a></li>
+            <li><a href="/db_hudoz">Художественная литература</a></li>
+        </ul>
+    </nav>
+
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            <li><a href="/index">На главную</a></li>
+            <li><a href="/addbook">Добавить книгу</a></li>
+            <li><a href="/deletebook">Удалить книгу</a></li>
+            <li><a href="/change">Изменить</a></li>
+            <li><a href="/find">Поиск</a></li>
+            <li><a href="/giving">Выдача</a></li>
+            <li class="active"><a href="/all_users">Все читатели</a></li>
+        </ul>
+    </nav>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Должность</th>
+            <th>Фамилия</th>
+            <th>Имя</th>
+            <th>Отчество</th>
+            <th>Класс обучения</th>
+            <th>Номер пропускной карточки</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%for message in users %}
+            <tr>
+                <th scope="row"><a style="color: grey" href="/person_page/{{message[6]}}">{{message[0]}}</a></th>
+                <td>{{message[1]}}</td>
+                <td>{{message[2]}}</td>
+                <td>{{message[3]}}</td>
+                <td>{{message[4]}}</td>
+                <td>{{message[5]}}</td>
+                <td><a style="color: grey" href="/person_page/{{message[6]}}">{{message[6]}}</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

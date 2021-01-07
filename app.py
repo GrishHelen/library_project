@@ -299,7 +299,8 @@ def change_it():
 def find_it():
     global found, database
     dict = {'id': 0, 'author': 1, 'name': 2, 'subject': 3, 'date': 4, 'yeartown': 5, 'number': 6, 'quantity': 7,
-            'price': 8, 'notes': 9, 'class': 10, 'clas': 10, 'decomission': 11, 'numberlist': 12, 'publisher': 13, 'sum set_1': 14,
+            'price': 8, 'notes': 9, 'class': 10, 'clas': 10, 'decomission': 11, 'numberlist': 12, 'publisher': 13,
+            'sum set_1': 14,
             'consignment': 15, 'code': 16}
     name = request.form["stolb"]
     typ = str(request.form["type"]).lower()
@@ -507,7 +508,41 @@ def person_page(pers_code):
     url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
           f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
           f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
-    return render_template('person_page.html', id=id, position=position, fio=fio, code=code, img=url)
+    history = []
+    con = sqlite3.connect('BD2.db')
+    cursoro = con.cursor()
+    spisok = [list(i) for i in cursoro.execute('SELECT * from history').fetchall()]
+    for sp in spisok:
+        if sp[2] != code:
+            continue
+
+        book = cursoro.execute(f'SELECT name from books WHERE code="{sp[1]}"').fetchall()
+        if len(book) == 0:
+            book = 'Не удалось найти книгу'
+        else:
+            book = book[0][0]
+        sp.insert(2, book)
+        sp[-1] = '.'.join(sp[-1].split('-')[::-1])
+        history.append(sp)
+
+    con = sqlite3.connect('BD1.db')
+    cursoro = con.cursor()
+    spisok = [list(i) for i in cursoro.execute('SELECT * from history').fetchall()]
+    for sp in spisok:
+        if sp[2] != code:
+            continue
+
+        book = cursoro.execute(f'SELECT name from books WHERE code="{sp[1]}"').fetchall()
+        if len(book) == 0:
+            book = 'Не удалось найти книгу'
+        else:
+            book = book[0][0]
+        sp.insert(2, book)
+        sp[-1] = '.'.join(sp[-1].split('-')[::-1])
+        history.append(sp)
+    history.sort(key=lambda i: -i[0])
+
+    return render_template('person_page.html', id=id, position=position, fio=fio, code=code, img=url, giving=history)
 
 
 @app.route('/student_change/<pers_code>', methods=['GET', 'POST'])
@@ -599,6 +634,30 @@ def teacher_change(pers_code):
             with open(filename, 'wb') as file:
                 file.write(img)
         return redirect(f'/person_page/{form.code.data}')
+
+
+@app.route('/all_users', methods=['GET'])
+def all_users():
+    con = sqlite3.connect('people.db')
+    cursoro = con.cursor()
+    p = list(cursoro.execute('SELECT * FROM numbers').fetchall())
+    print(p)
+    users = []
+    for i in p:
+        a = [i[0], PROFS[i[1]]]
+        a.extend(i[2].split('_'))
+        users.append(a)
+        if i[1] == 'student':
+            now = datetime.datetime.now()
+            year = now.year
+            if now.month >= 6:
+                year += 1
+            year -= int(i[0].split('_')[-1])
+            a.append(year)
+        else:
+            a.append('')
+        a.append(i[-1])
+    return render_template('all_users.html', users=users)
 
 
 if __name__ == "__main__":
