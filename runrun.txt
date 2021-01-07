@@ -1,0 +1,7 @@
+
+"C:\Users\user1\AppData\Local\Programs\Python\Python36\python.exe" "C:\Users\user1\Desktop\AppNew\app.py"
+
+pause
+
+start run_503.bat
+start http://127.0.0.1:5000/ && exit
