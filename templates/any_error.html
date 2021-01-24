@@ -8,7 +8,7 @@
             {% if db == 'BD1.db'%}
             <li><a href="/db_ucheb">Учебная литература</a></li>
             <li class="active"><a href="/db_hudoz">Художественная литература</a></li>
-            {% else %}
+            {% elif db == 'BD2.db' %}
             <li class="active"><a href="/db_ucheb">Учебная литература</a></li>
             <li><a href="/db_hudoz">Художественная литература</a></li>
             {% endif %}
@@ -19,7 +19,7 @@
         <ul class="nav navbar-nav">
             <li><a href="/index">На главную</a></li>
             <li><a href="/addbook">Добавить книгу</a></li>
-            <li class="active"><a href="/deletebook">Удалить книгу</a></li>
+            <li><a href="/deletebook">Удалить книгу</a></li>
             <li><a href="/change">Изменить</a></li>
             <li><a href="/find">Поиск</a></li>
             <li><a href="/giving">Выдача</a></li>
@@ -28,8 +28,8 @@
     </nav>
 
 <div class="wrapper container">
-    <h3><a style="color: rgb(85, 60, 240)">Упс.. что-то пошло не так...</a></h3>
-    <div><big>{{err}}</big></div>
+    <h3><a style="font-size: 17pt; color: rgb(85, 60, 240)">Упс.. что-то пошло не так...</a></h3>
+    <div><a style="font-size: 13pt; color: grey">{{err}}</a></div>
 </div>
 </div>
 

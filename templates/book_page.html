@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="wrapper container">
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            {% if db == 'BD1.db'%}
+            <li><a href="/db_ucheb">Учебная литература</a></li>
+            <li class="active"><a href="/db_hudoz">Художественная литература</a></li>
+            {% else %}
+            <li class="active"><a href="/db_ucheb">Учебная литература</a></li>
+            <li><a href="/db_hudoz">Художественная литература</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+            <li><a href="/index">На главную</a></li>
+            <li><a href="/addbook">Добавить книгу</a></li>
+            <li><a href="/deletebook">Удалить книгу</a></li>
+            <li><a href="/change">Изменить</a></li>
+            <li><a href="/find">Поиск</a></li>
+            <li><a href="/giving">Выдача</a></li>
+            <li><a href="/all_users">Все 'читатели'</a></li>
+        </ul>
+    </nav>
+
+    <p>
+
+    <h3 style="color: rgb(30,170,200)"><big>Просмотр информации о книге</big></h3>
+    <h4><big>Номер в списке: {{message[0]}}</big></h4>
+    <h3><a style="color: rgb(143, 143, 143); text-decoration: underline">Автор:</a> {{message[1]}}</h3>
+    <h3><a style="color: rgb(143, 143, 143); text-decoration: underline">Название:</a> {{message[2]}}</h3>
+    {% if db == 'BD1.db'%}
+    <h3>Категория: Художественная литература</h3>
+    {% else %}
+    <h3>Категория: Учебная литература</h3>
+    {% endif %}
+
+    {% if message[3] != ""%}
+    <h3>Предмет: {{message[3]}}</h3>
+    {% endif %}
+    {% if message[10] != ""%}
+    <h3>Класс: {{message[10]}}</h3>
+    {% endif %}
+    {% if message[5] != ""%}
+    <h3>Год издания: {{message[5]}}</h3>
+    {% endif %}
+    {% if message[13] != ""%}
+    <h3>Издательство: {{message[13]}}</h3>
+    {% endif %}
+    {% if message[6] != ""%}
+    <h3>Номер издания: {{message[6]}}</h3>
+    {% endif %}
+    {% if message[4] != ""%}
+    <h3>Дата постановки на учет: {{message[4]}}</h3>
+    {% endif %}
+    {% if message[7] != ""%}
+    <h3>Количество: {{message[7]}}</h3>
+    {% endif %}
+    {% if message[8] != ""%}
+    <h3>Цена: {{message[8]}}</h3>
+    {% endif %}
+    {% if message[14] != ""%}
+    <h3>Общая сумма: {{message[14]}}</h3>
+    {% endif %}
+    {% if message[16] != ""%}
+    <h3>Накладная: {{message[16]}}</h3>
+    {% endif %}
+    {% if message[12] != ""%}
+    <h3>П/П: {{message[12]}}</h3>
+    {% endif %}
+    {% if message[15] != ""%}
+    <h3>КСУ: {{message[15]}}</h3>
+    {% endif %}
+    {% if message[11] != ""%}
+    <h3>Акт выбытия: {{message[11]}}</h3>
+    {% endif %}
+    {% if message[9] != ""%}
+    <h3>Примечания: {{message[9]}}</h3>
+    {% endif %}
+    {% if message[17] != ""%}
+    <h3>Штрих-код: {{message[17]}}</h3>
+    <img src={{img}} alt="здесь должен быть штрих-код книги, но он почему-то не загрузился">
+    {% endif %}
+
+    <div><a class="btn btn-primary" style="font-size: 12pt" href="/dell/{{message[0]}}">Удалить</a>
+        <a class="btn btn-primary" style="font-size: 12pt" href="/book_change/{{message[0]}}">Редактировать</a></div>
+
+</div>
+<footer>
+
+</footer>
+{% endblock %}

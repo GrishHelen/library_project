@@ -91,6 +91,12 @@ def change():
     return render_template("change.html", changing=changing, db=database)
 
 
+@app.route('/book_change/<book_code>')
+def book_change(book_code):
+    return render_template('any_error.html', err=f'Кажется, страница изменения книг еще не создана.',
+                           db=database)
+
+
 @app.route("/error", methods=["GET"])
 def error():
     global database
@@ -192,6 +198,13 @@ def yes_add():
         quantity, price, notes, clas, decomission, numberinlist, publisher, sum, set_1, consignment, code)\
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     tuple(M))
+    url = f'https://barcode.tec-it.com/barcode.ashx?data={M[17]}&code=&multiplebarcodes=false&' \
+          f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+          f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+    filename = f'book_codes/{M[17]}.jpg'
+    img = urllib.request.urlopen(url).read()
+    with open(filename, 'wb') as file:
+        file.write(img)
     con.commit()
     con.close()
     return redirect(url_for("adbook"))
@@ -223,6 +236,33 @@ def delete():
     con.commit()
     con.close()
     return redirect(url_for("deletebook"))
+
+
+@app.route('/dell/<number>', methods=['GET', 'POST'])
+def dell(number):
+    global table, database, V
+    con = sqlite3.connect(database)
+    cursoro = con.cursor()
+    if "-" in number:
+        p = number.split("-")
+        for k in range(int(p[0]), int(p[1]) + 1):
+            cursoro.execute("DELETE FROM books WHERE id={}".format(str(k)))
+            con.commit()
+        top = cursoro.execute('SELECT id FROM books').fetchall()[-1][0]
+        for i in range(int(p[1]) + 1, int(top) + 1):
+            cursoro.execute('UPDATE books SET id={} WHERE id={}'.format(i + int(p[0]) - 1 - int(p[1]), i))
+        con.commit()
+    else:
+        cursoro.execute("DELETE FROM books WHERE id={}".format(number))
+        con.commit()
+        top = cursoro.execute('SELECT id FROM books').fetchall()[-1][0]
+        for i in range(int(number) + 1, int(top) + 1):
+            cursoro.execute('UPDATE books SET id={} WHERE id={}'.format(i - 1, i))
+        con.commit()
+    table = cursoro.execute('SELECT * FROM books').fetchall()
+    con.commit()
+    con.close()
+    return deletebook()
 
 
 @app.route("/change_it", methods=["POST"])
@@ -450,18 +490,20 @@ def give_book():
             return render_template('take_give_book.html', form=form, db=database, message='Введите штрих-код книги')
         con = sqlite3.connect('people.db')
         cursoro = con.cursor()
-        p = list(
-            cursoro.execute('SELECT * FROM numbers WHERE code={}'.format(form.person_code.data)).fetchall())
+        p = list(cursoro.execute(f'SELECT * FROM numbers WHERE code={form.person_code.data}').fetchall())
         if len(p) == 0:
             return render_template('take_give_book.html', form=form, db=database,
                                    message='Такого человека нет в базе данных')
-        fio = p[0][2]
-        today = datetime.datetime.date(datetime.datetime.now())
         con = sqlite3.connect(database)
         cursoro = con.cursor()
-        cursoro.execute(
-            f'INSERT INTO history (person_fio, person_code, book, action, date) VALUES ("{fio}", '
-            f'{form.person_code.data}, "{form.book.data}", "выдать", "{today}")')
+        bo = list(cursoro.execute(f'SELECT * FROM books WHERE code={form.book.data}').fetchall())
+        if len(bo) == 0:
+            return render_template('take_give_book.html', form=form, db=database,
+                                   message='Не удалось найти книгу в базе данных')
+        fio = p[0][2]
+        today = datetime.datetime.date(datetime.datetime.now())
+        cursoro.execute(f'INSERT INTO history (person_fio, person_code, book, action, date) VALUES ("{fio}", '
+                        f'{form.person_code.data}, "{form.book.data}", "выдать", "{today}")')
         con.commit()
         return redirect('/giving')
 
@@ -484,6 +526,12 @@ def take_book():
         if len(p) == 0:
             return render_template('take_give_book.html', form=form, db=database,
                                    message='Такого человека нет в базе данных')
+        con = sqlite3.connect(database)
+        cursoro = con.cursor()
+        bo = list(cursoro.execute(f'SELECT * FROM books WHERE code={form.book.data}').fetchall())
+        if len(bo) == 0:
+            return render_template('take_give_book.html', form=form, db=database,
+                                   message='Не удалось найти книгу в базе данных')
         fio = p[0][2]
         today = datetime.datetime.date(datetime.datetime.now())
         con = sqlite3.connect(database)
@@ -501,7 +549,7 @@ def person_page(pers_code):
     cursoro = con.cursor()
     p = cursoro.execute(f'SELECT * FROM numbers WHERE code={pers_code}').fetchall()
     if len(p) == 0:
-        return render_template('any_error.html', err=f'Не удалось найти пользователя с кодом {pers_code}')
+        return render_template('any_error.html', err=f'Не удалось найти пользователя с кодом {pers_code}', db=database)
     id, pos, fio, code = p[0]
     position = PROFS[pos]
     fio = ' '.join(fio.split('_'))
@@ -515,7 +563,6 @@ def person_page(pers_code):
     for sp in spisok:
         if sp[2] != code:
             continue
-
         book = cursoro.execute(f'SELECT name from books WHERE code="{sp[1]}"').fetchall()
         if len(book) == 0:
             book = 'Не удалось найти книгу'
@@ -531,7 +578,6 @@ def person_page(pers_code):
     for sp in spisok:
         if sp[2] != code:
             continue
-
         book = cursoro.execute(f'SELECT name from books WHERE code="{sp[1]}"').fetchall()
         if len(book) == 0:
             book = 'Не удалось найти книгу'
@@ -542,7 +588,8 @@ def person_page(pers_code):
         history.append(sp)
     history.sort(key=lambda i: -i[0])
 
-    return render_template('person_page.html', id=id, position=position, fio=fio, code=code, img=url, giving=history)
+    return render_template('person_page.html', id=id, position=position, fio=fio, code=code, img=url, giving=history,
+                           db=database)
 
 
 @app.route('/student_change/<pers_code>', methods=['GET', 'POST'])
@@ -600,7 +647,7 @@ def teacher_change(pers_code):
     cursoro = con.cursor()
     p = list(cursoro.execute(f'SELECT * FROM numbers WHERE code={pers_code}').fetchall())
     if len(p) == 0:
-        return render_template('any_error.html', err='Такого человека нет в базе данных')
+        return render_template('any_error.html', err='Такого человека нет в базе данных', db=database)
     id, position, fio, code = p[0]
     if position == 'student':
         return redirect(f'/student_change/{pers_code}')
@@ -641,7 +688,6 @@ def all_users():
     con = sqlite3.connect('people.db')
     cursoro = con.cursor()
     p = list(cursoro.execute('SELECT * FROM numbers').fetchall())
-    print(p)
     users = []
     for i in p:
         a = [i[0], PROFS[i[1]]]
@@ -657,7 +703,30 @@ def all_users():
         else:
             a.append('')
         a.append(i[-1])
-    return render_template('all_users.html', users=users)
+    return render_template('all_users.html', db=database, users=users)
+
+
+@app.route('/book_page/<book_code>', methods=['GET', 'POST'])
+def book_page(book_code):
+    con = sqlite3.connect(database)
+    cursoro = con.cursor()
+    p = list(cursoro.execute(f'SELECT * FROM books WHERE code={book_code}').fetchall())
+    url = f'https://barcode.tec-it.com/barcode.ashx?data={book_code}&code=&multiplebarcodes=false&' \
+          f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+          f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+    if len(p) == 0:
+        if database == 'BD2.db':
+            db = 'Учебная литература'
+        else:
+            db = 'Художественная литература'
+        return render_template('any_error.html', db=database, err=f'Не удалось найти книгу с штрих-кодом {book_code} '
+                                                                  f'в категории "{db}". Возможно, она не стоит на учете'
+                                                                  f' или относится к другой категории.')
+    p = list(p[0])
+    for i in range(len(p)):
+        if p[i] is None:
+            p[i] = ''
+    return render_template('book_page.html', message=p, db=database, img=url)
 
 
 if __name__ == "__main__":

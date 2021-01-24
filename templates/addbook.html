@@ -228,9 +228,9 @@
             <tbody>
             {%for message in messages %}
             <tr>
-                <th scope="row">{{message.id}}</th>
+                <th scope="row"><a href="/book_page/{{message.code}}" style="color: rgb(143, 143, 143)">{{message.id}}</a></th>
                 <td>{{message.author}}</td>
-                <td>{{message.name}}</td>
+                <td><a href="/book_page/{{message.code}}" style="color: rgb(143, 143, 143)">{{message.name}}</a></td>
                 <td>{{message.subject}}</td>
                 <td>{{message.clas}}</td>
                 <td>{{message.yeartown}}</td>
@@ -245,7 +245,7 @@
                 <td>{{message.set_1}}</td>
                 <td>{{message.decomission}}</td>
                 <td>{{message.notes}}</td>
-                <td>{{message.code}}</td>
+                <td><a href="/book_page/{{message.code}}" style="color: rgb(143, 143, 143)">{{message.code}}</a></td>
             </tr>
             {% endfor %}
             </tbody>

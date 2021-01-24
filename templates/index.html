@@ -55,9 +55,9 @@
         <tbody>
         {%for message in show_all %}
         <tr>
-            <th scope="row">{{message[0]}}</th>
+            <th scope="row"><a href="/book_page/{{message[17]}}"  style="color: rgb(143, 143, 143)">{{message[0]}}</a></th>
             <td>{{message[1]}}</td>
-            <td>{{message[2]}}</td>
+            <td><a href="/book_page/{{message[17]}}"  style="color: rgb(143, 143, 143)">{{message[2]}}</a></td>
             <td>{{message[3]}}</td>
             <td>{{message[10]}}</td>
             <td>{{message[5]}}</td>
@@ -72,7 +72,7 @@
             <td>{{message[15]}}</td>
             <td>{{message[11]}}</td>
             <td>{{message[9]}}</td>
-            <td>{{message[17]}}</td>
+            <td><a href="/book_page/{{message[17]}}"  style="color: rgb(143, 143, 143)">{{message[17]}}</a></td>
         </tr>
         {% endfor %}
         </tbody>
