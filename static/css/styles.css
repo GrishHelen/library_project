@@ -108,7 +108,7 @@ figure {
 fieldset {
   border: 1px solid #c0c0c0;
   margin: 0 2px;
-  padding: 0.35em 0.625em 0.75em;
+  padding: 0.67em 0.625em 0.75em;
 }
 legend {
   border: 0;
@@ -6553,7 +6553,6 @@ p {
   padding: 10px;
 }
 body {
-  background-image: url(../images/bg.png);
   border-top: 5px solid #7e7e7e;
 }
 body .wrapper {
@@ -6576,7 +6575,6 @@ body .wrapper .heading {
   padding-left: 20px;
 }
 body .wrapper .heading h1 {
-  background: url(../images/bg.png);
   color: #7e7e7e;
   display: inline-block;
   font: normal 40px/40px 'Oswald', sans-serif;

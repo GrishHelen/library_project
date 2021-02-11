@@ -67,11 +67,11 @@
 
                     {% if s['date'] == '' %}
                     <th><label class="sr-only" for="searchInput3">Дата постановки на учет</label>
-                        <input class="form-control" id="searchInput3" type="date" name="date"
+                        <input class="form-control" id="searchInput3" type="text" name="date"
                                placeholder="Дата постановки на учет"></th>
                     {% else %}
                     <th><label class="sr-only" for="searchInput3">Дата постановки на учет</label>
-                        <input class="form-control" id="searchInput3" type="date" name="date"
+                        <input class="form-control" id="searchInput3" type="text" name="date"
                                placeholder="Дата постановки на учет" value={{s['date']}}></th>
                     {% endif %}
 
@@ -177,6 +177,7 @@
                     <th><label class="sr-only" for="searchInput14">Накладная</label>
                         <input class="form-control" id="searchInput14" type="text" name="consignment"
                                placeholder="Накладная"></th>
+
                     {% else %}
                     <th><label class="sr-only" for="searchInput14">Накладная</label>
                         <input class="form-control" id="searchInput14" type="text" name="consignment"
@@ -192,6 +193,17 @@
                     <th><label class="sr-only" for="searchInput17">Штрих-код</label>
                         <input class="form-control" id="searchInput17" type="text" name="code"
                                placeholder="Штрих-код" value={{s['code']}}></th>
+                    {% endif %}
+
+                    {% if s['datecon'] == '' %}
+                    <th><label class="sr-only" for="searchInput18">Дата по накладной</label>
+                        <input class="form-control" id="searchInput18" type="text" name="datecon" placeholder="Дата по накладной">
+                    </th>
+                    {% else %}
+                    <th><label class="sr-only" for="searchInput18">Дата по накладной</label>
+                        <input class="form-control" id="searchInput18" type="text" name="datecon" placeholder="Дата по накладной"
+                               value='{{s["datecon"]}}'>
+                    </th>
                     {% endif %}
                 </tr>
                 <div class="input-group-btn">
@@ -218,6 +230,7 @@
                 <th>Цена</th>
                 <th>Общая сумма</th>
                 <th>Накладная</th>
+                <th>Дата по накладной</th>
                 <th>П/П</th>
                 <th>КСУ</th>
                 <th>Акт выбытия</th>
@@ -228,9 +241,9 @@
             <tbody>
             {%for message in messages %}
             <tr>
-                <th scope="row"><a href="/book_page/{{message.code}}" style="color: rgb(143, 143, 143)">{{message.id}}</a></th>
+                <th scope="row"><a href="/book_page/{{message.code}}" style="color: #1E1E5A">{{message.id}}</a></th>
                 <td>{{message.author}}</td>
-                <td><a href="/book_page/{{message.code}}" style="color: rgb(143, 143, 143)">{{message.name}}</a></td>
+                <td><a href="/book_page/{{message.code}}" style="color: #1E1E5A">{{message.name}}</a></td>
                 <td>{{message.subject}}</td>
                 <td>{{message.clas}}</td>
                 <td>{{message.yeartown}}</td>
@@ -241,11 +254,12 @@
                 <td>{{message.price}}</td>
                 <td>{{message.sum}}</td>
                 <td>{{message.consignment}}</td>
+                <td>{{message.datecon}}</td>
                 <td>{{message.numberinlist}}</td>
                 <td>{{message.set_1}}</td>
                 <td>{{message.decomission}}</td>
                 <td>{{message.notes}}</td>
-                <td><a href="/book_page/{{message.code}}" style="color: rgb(143, 143, 143)">{{message.code}}</a></td>
+                <td><a href="/book_page/{{message.code}}" style="color: #1E1E5A">{{message.code}}</a></td>
             </tr>
             {% endfor %}
             </tbody>

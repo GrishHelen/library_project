@@ -20,7 +20,7 @@ PROFS = {"dir": "Директор", "zamdir": "Заместитель дирек
          "eng": "Учитель английского языка", "french": "Учитель французского языка", "student": "Ученик",
          "latin": "Учитель латинского языка", "german": "Учитель немецкого языка", "other": "Другое"}
 Message = namedtuple('Message', "id author name subject date yeartown number quantity price notes clas "
-                                "decomission numberinlist publisher sum set_1 consignment code")
+                                "decomission numberinlist publisher sum set_1 consignment code datecon")
 messages = []
 found = []
 M = tuple()
@@ -36,6 +36,7 @@ def index():
     cursoro = con.cursor()
     show_all = cursoro.execute('SELECT * FROM books').fetchall()
     con.commit()
+    con.close()
     return render_template("index.html", show_all=show_all, db=database)
 
 
@@ -64,7 +65,7 @@ def adbook():
     V = 0
     slovar = {'author': '', 'name': '', 'subject': '', 'date': '', 'yeartown': '', 'number': '', 'quantity': '',
               'price': '', 'notes': '', 'clas': '', 'decomission': '', 'numberinlist': '', 'publisher': '',
-              'set_1': '', 'consignment': '', 'code': ''}
+              'set_1': '', 'consignment': '', 'code': '', 'datecon': ''}
     return render_template("addbook.html", messages=messages, db=database, s=slovar)
 
 
@@ -93,7 +94,7 @@ def change():
 
 @app.route('/book_change/<book_code>')
 def book_change(book_code):
-    return render_template('any_error.html', err=f'Кажется, страница изменения книг еще не создана.',
+    return render_template('any_error.html', err=f'Страница изменения книг еще не создана.',
                            db=database)
 
 
@@ -105,7 +106,7 @@ def error():
 
 @app.route("/add_message", methods=["GET", "POST"])
 def add_message():
-    global database, V
+    global database
     slovar = {}
     author = request.form["author"]
     slovar["author"] = author
@@ -137,6 +138,8 @@ def add_message():
     slovar["set_1"] = set_1
     consignment = request.form["consignment"]
     slovar["consignment"] = consignment
+    datecon = request.form["datecon"]
+    slovar["datecon"] = datecon
     try:
         sum = int(quantity) * float(price)
     except Exception:
@@ -149,11 +152,6 @@ def add_message():
     except Exception:
         pass
     slovar['code'] = code
-    V += 1
-
-    if V < 2:
-        return render_template("addbook.html", messages=messages, db=database, s=slovar)
-    V = 0
 
     con = sqlite3.connect(database)
     cursoro = con.cursor()
@@ -161,25 +159,26 @@ def add_message():
 
     usual_publishers = list(set(cursoro.execute('SELECT publisher FROM books').fetchall()))
     con.commit()
-    cc = [i[0] for i in list(cursoro.execute('SELECT code from books').fetchall())]
+    cc = set([i[0] for i in list(cursoro.execute('SELECT code from books').fetchall())])
     if str(code).strip() != '' and code is not None and int(code) in cc:
         return render_template("addbook.html", messages=messages, db=database, s=slovar,
                                wrong='Книга с таким штрих-кодом уже есть в базе данных')
     if (publisher,) in usual_publishers:
         messages.append(Message(id, author, name, subject, date, yeartown, number, quantity, price, notes, clas,
-                                decomission, numberinlist, publisher, sum, set_1, consignment, code))
+                                decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon))
         cursoro.execute('INSERT INTO books (id, author, name, subject, date, yeartown, number,\
-    quantity, price, notes, clas, decomission, numberinlist, publisher, sum, set_1, consignment, code)\
-    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    quantity, price, notes, clas, decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon)\
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                         tuple(Message(id, author, name, subject, date, yeartown, number, quantity, price, notes,
-                                      clas, decomission, numberinlist, publisher, sum, set_1, consignment, code)))
+                                      clas, decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon)))
         con.commit()
         con.close()
         return redirect(url_for("adbook"))
     else:
         global M
+        con.close()
         M = tuple(Message(id, author, name, subject, date, yeartown, number, quantity, price, notes, clas,
-                          decomission, numberinlist, publisher, sum, set_1, consignment, code))
+                          decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon))
         return redirect(url_for('error'))
 
 
@@ -188,16 +187,14 @@ def yes_add():
     global M, messages, database
     if str(M[2]).strip() == '':
         return redirect(url_for("adbook"))
-    messages.append(
-        Message(M[0], M[1], M[2], M[3], M[4], M[5], M[6], M[7], M[8], M[9], M[10], M[11], M[12], M[13], M[14],
-                M[15],
-                M[16], M[17]))
+    messages.append(Message(M[0], M[1], M[2], M[3], M[4], M[5], M[6], M[7], M[8], M[9], M[10], M[11], M[12], M[13],
+                            M[14], M[15], M[16], M[17], M[18]))
     con = sqlite3.connect(database)
     cursoro = con.cursor()
-    cursoro.execute('INSERT INTO books (id, author, name, subject, date, yeartown, number,\
-        quantity, price, notes, clas, decomission, numberinlist, publisher, sum, set_1, consignment, code)\
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                    tuple(M))
+    cursoro.execute('SELECT * from books').fetchall()
+    cursoro.execute('INSERT INTO books (id, author, name, subject, date, yeartown, number, quantity, price, notes, '
+                    'clas, decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon) '
+                    'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', tuple(M))
     url = f'https://barcode.tec-it.com/barcode.ashx?data={M[17]}&code=&multiplebarcodes=false&' \
           f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
           f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
@@ -285,6 +282,7 @@ def change_it():
     consignment = request.form["consignment"]
     code = request.form["code"]
     id_book = int(request.form["id"])
+    datecon = request.form["datecon"]
 
     con = sqlite3.connect(database)
     cursoro = con.cursor()
@@ -321,6 +319,8 @@ def change_it():
         cursoro.execute('UPDATE books SET consignment = "{}" where id = {}'.format(consignment, id_book))
     if code:
         cursoro.execute('UPDATE books SET code = "{}" where id = {}'.format(int(code), id_book))
+    if datecon:
+        cursoro.execute('UPDATE books SET datecon = "{}" where id = {}'.format(datecon, id_book))
     con.commit()
     try:
         pr = float(cursoro.execute('SELECT price FROM books WHERE id={}'.format(id_book)).fetchone()[0])
@@ -330,7 +330,6 @@ def change_it():
     except Exception:
         pass
     changing = cursoro.execute('SELECT * FROM books').fetchall()
-    con.commit()
     con.close()
     return render_template("change.html", changing=changing, messages=messages, db=database)
 
@@ -341,7 +340,7 @@ def find_it():
     dict = {'id': 0, 'author': 1, 'name': 2, 'subject': 3, 'date': 4, 'yeartown': 5, 'number': 6, 'quantity': 7,
             'price': 8, 'notes': 9, 'class': 10, 'clas': 10, 'decomission': 11, 'numberlist': 12, 'publisher': 13,
             'sum set_1': 14,
-            'consignment': 15, 'code': 16}
+            'consignment': 15, 'code': 16, 'datecon': 18}
     name = request.form["stolb"]
     typ = str(request.form["type"]).lower()
     name_1 = dict[name]
@@ -372,10 +371,11 @@ def giving():
         else:
             book = book[0][0]
         sp.insert(2, book)
+    con.close()
     cursoro = sqlite3.connect('people.db').cursor()
     for sp in spisok:
         fio = cursoro.execute(f'SELECT fio from numbers WHERE code="{sp[3]}"').fetchone()
-        fio = fio[0].split('_')
+        fio = sp[4].split('_')
         if fio[-1] == '-':
             fio.remove('-')
         fio = ' '.join(fio)
@@ -424,6 +424,7 @@ def new_teacher():
         with open(filename, 'wb') as file:
             file.write(img)
         con.commit()
+        con.close()
         return redirect(f'/person_page/{code}')
 
 
@@ -473,6 +474,7 @@ def new_student():
         with open(filename, 'wb') as file:
             file.write(img)
         con.commit()
+        con.close()
         return redirect(f'/person_page/{code}')
 
 
@@ -505,6 +507,7 @@ def give_book():
         cursoro.execute(f'INSERT INTO history (person_fio, person_code, book, action, date) VALUES ("{fio}", '
                         f'{form.person_code.data}, "{form.book.data}", "выдать", "{today}")')
         con.commit()
+        con.close()
         return redirect('/giving')
 
 
@@ -540,6 +543,7 @@ def take_book():
             f'INSERT INTO history (person_fio, person_code, book, action, date) VALUES ("{fio}", '
             f'{form.person_code.data}, "{form.book.data}", "принять", "{today}")')
         con.commit()
+        con.close()
         return redirect('/giving')
 
 
@@ -571,7 +575,7 @@ def person_page(pers_code):
         sp.insert(2, book)
         sp[-1] = '.'.join(sp[-1].split('-')[::-1])
         history.append(sp)
-
+    con.close()
     con = sqlite3.connect('BD1.db')
     cursoro = con.cursor()
     spisok = [list(i) for i in cursoro.execute('SELECT * from history').fetchall()]
@@ -587,7 +591,7 @@ def person_page(pers_code):
         sp[-1] = '.'.join(sp[-1].split('-')[::-1])
         history.append(sp)
     history.sort(key=lambda i: -i[0])
-
+    con.close()
     return render_template('person_page.html', id=id, position=position, fio=fio, code=code, img=url, giving=history,
                            db=database)
 
@@ -629,6 +633,7 @@ def student_change(pers_code):
         fio = form.name.data + '_' + form.father.data + '_' + form.surname.data
         cursoro.execute(f"UPDATE numbers SET id='{id}', fio='{fio}', code={form.code.data} WHERE code={pers_code}")
         con.commit()
+        con.close()
         if pers_code != form.code.data:
             os.remove(f'people_codes/{pers_code}.jpg')
             url = f'https://barcode.tec-it.com/barcode.ashx?data={form.code.data}&code=&multiplebarcodes=false&' \
@@ -671,6 +676,7 @@ def teacher_change(pers_code):
         cursoro.execute(f"UPDATE numbers SET id='{id}', fio='{fio}', code={form.code.data}, "
                         f"position='{form.position.data}' WHERE code={pers_code}")
         con.commit()
+        con.close()
         if pers_code != form.code.data:
             os.remove(f'people_codes/{pers_code}.jpg')
             url = f'https://barcode.tec-it.com/barcode.ashx?data={form.code.data}&code=&multiplebarcodes=false&' \
@@ -688,6 +694,7 @@ def all_users():
     con = sqlite3.connect('people.db')
     cursoro = con.cursor()
     p = list(cursoro.execute('SELECT * FROM numbers').fetchall())
+    con.close()
     users = []
     for i in p:
         a = [i[0], PROFS[i[1]]]
@@ -708,8 +715,10 @@ def all_users():
 
 @app.route('/book_page/<book_code>', methods=['GET', 'POST'])
 def book_page(book_code):
-    con = sqlite3.connect(database)
-    cursoro = con.cursor()
+    if str(book_code).strip() in ['None', '']:
+        return render_template('any_error.html', db=database, err=f'Не удалось перейти на страницу книги. '
+                                                                  f'У этой книги нет штрих-кода')
+    cursoro = sqlite3.connect(database).cursor()
     p = list(cursoro.execute(f'SELECT * FROM books WHERE code={book_code}').fetchall())
     url = f'https://barcode.tec-it.com/barcode.ashx?data={book_code}&code=&multiplebarcodes=false&' \
           f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \

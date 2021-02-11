@@ -37,7 +37,7 @@
                 <th><label class="sr-only" for="searchInput2">Предмет</label>
                     <input class="form-control" id="searchInput2" type="text" name="subject" placeholder="Предмет"></th>
                 <th><label class="sr-only" for="searchInput3">Дата постановки на учет</label>
-                    <input class="form-control" id="searchInput3" type="date" name="date"
+                    <input class="form-control" id="searchInput3" type="text" name="date"
                            placeholder="Дата постановки на учет"></th>
                 <th><label class="sr-only" for="searchInput4">Год издания</label>
                     <input class="form-control" id="searchInput4" type="text" name="yeartown" placeholder="Год издания">
@@ -76,6 +76,8 @@
                            placeholder="Накладная"></th>
             </tr>
             <tr>
+                <th><label class="sr-only" for="searchInput18">Дата по накладной</label>
+                    <input class="form-control" id="searchInput18" type="text" name="datecon" placeholder="Дата по накладной"></th>
                 <th><label class="sr-only" for="searchInput17">Штрих-код</label>
                     <input class="form-control" id="searchInput17" type="text" name="code"
                            placeholder="Штрих-код"></th>
@@ -105,6 +107,7 @@
             <th>Цена</th>
             <th>Общая сумма</th>
             <th>Накладная</th>
+            <th>Дата по накладной</th>
             <th>П/П</th>
             <th>КСУ</th>
             <th>Акт выбытия</th>
@@ -128,6 +131,7 @@
             <td>{{message[8]}}</td>
             <td>{{message[14]}}</td>
             <td>{{message[16]}}</td>
+            <td>{{message[18]}}</td>
             <td>{{message[12]}}</td>
             <td>{{message[15]}}</td>
             <td>{{message[11]}}</td>

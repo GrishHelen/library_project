@@ -45,6 +45,7 @@
             <th>Цена</th>
             <th>Общая сумма</th>
             <th>Накладная</th>
+            <th>Дата по накладной</th>
             <th>П/П</th>
             <th>КСУ</th>
             <th>Акт выбытия</th>
@@ -55,9 +56,9 @@
         <tbody>
         {%for message in show_all %}
         <tr>
-            <th scope="row"><a href="/book_page/{{message[17]}}"  style="color: rgb(143, 143, 143)">{{message[0]}}</a></th>
+            <th scope="row"><a href="/book_page/{{message[17]}}"  style="color: #1E1E5A">{{message[0]}}</a></th>
             <td>{{message[1]}}</td>
-            <td><a href="/book_page/{{message[17]}}"  style="color: rgb(143, 143, 143)">{{message[2]}}</a></td>
+            <td><a href="/book_page/{{message[17]}}"  style="color: #1E1E5A">{{message[2]}}</a></td>
             <td>{{message[3]}}</td>
             <td>{{message[10]}}</td>
             <td>{{message[5]}}</td>
@@ -68,11 +69,12 @@
             <td>{{message[8]}}</td>
             <td>{{message[14]}}</td>
             <td>{{message[16]}}</td>
+            <td>{{message[18]}}</td>
             <td>{{message[12]}}</td>
             <td>{{message[15]}}</td>
             <td>{{message[11]}}</td>
             <td>{{message[9]}}</td>
-            <td><a href="/book_page/{{message[17]}}"  style="color: rgb(143, 143, 143)">{{message[17]}}</a></td>
+            <td><a href="/book_page/{{message[17]}}"  style="color: #1E1E5A">{{message[17]}}</a></td>
         </tr>
         {% endfor %}
         </tbody>
