@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Библиотека</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='../static/css/styles.css') }}" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Oswald:400,300" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<p></p>
+<div class="wrapper container">
+    <h1>Книга</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+        <p>
+            {{ form.author.label }}<br>
+            {{ form.author(class="form-control") }}<br>
+            {% for error in form.author.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(class="form-control") }}<br>
+            {% for error in form.name.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.subject.label }}<br>
+            {{ form.subject(class="form-control") }}<br>
+            {% for error in form.subject.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.clas.label }}<br>
+            {{ form.clas(class="form-control") }}<br>
+            {% for error in form.clas.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.yeartown.label }}<br>
+            {{ form.yeartown(class="form-control") }}<br>
+            {% for error in form.yeartown.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.publisher.label }}<br>
+            {{ form.publisher(class="form-control") }}<br>
+            {% for error in form.publisher.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.number.label }}<br>
+            {{ form.number(class="form-control") }}<br>
+            {% for error in form.number.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.date.label }}<br>
+            {{ form.date(class="form-control") }}<br>
+            {% for error in form.date.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.quantity.label }}<br>
+            {{ form.quantity(class="form-control") }}<br>
+            {% for error in form.quantity.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.price.label }}<br>
+            {{ form.price(class="form-control") }}<br>
+            {% for error in form.price.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.sum.label }}<br>
+            {{ form.sum(class="form-control") }}<br>
+            {% for error in form.sum.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.consignment.label }}<br>
+            {{ form.consignment(class="form-control") }}<br>
+            {% for error in form.consignment.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.datecon.label }}<br>
+            {{ form.datecon(class="form-control") }}<br>
+            {% for error in form.datecon.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.numberinlist.label }}<br>
+            {{ form.numberinlist(class="form-control") }}<br>
+            {% for error in form.numberinlist.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.set_1.label }}<br>
+            {{ form.set_1(class="form-control") }}<br>
+            {% for error in form.set_1.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.decomission.label }}<br>
+            {{ form.decomission(class="form-control") }}<br>
+            {% for error in form.decomission.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.notes.label }}<br>
+            {{ form.notes(class="form-control") }}<br>
+            {% for error in form.notes.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>
+            {{ form.code.label }}<br>
+            {{ form.code(class="form-control") }}<br>
+            {% for error in form.code.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endfor %}
+        </p>
+
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <div>Обязательные поля отмечены звездочкой (*)</div>
+        <div><a style="color: rgb(182, 0, 12); font-size: 11pt;">{{message}}</a></div>
+    </form>
+</div>
+</body>
+</html>

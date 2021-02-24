@@ -4,7 +4,7 @@ import os
 import urllib
 from collections import namedtuple
 from flask import Flask, render_template, redirect, url_for, request, g
-from data.forms import NewTeacher, NewStudent, TakeBook, GiveBook
+from data.forms import NewTeacher, NewStudent, TakeBook, GiveBook, NewBook
 from data.db_session import create_session, global_init
 
 app = Flask(__name__)
@@ -32,12 +32,30 @@ V = 0  # не трогать. это для добавления книг (пр�
 @app.route("/", methods=["GET"])
 def index():
     global database
+    a = list(map(int, request.args.getlist('a')))
+    x = [-1, f'{len(a)} шт.', 0, 0]
     con = sqlite3.connect(database)
     cursoro = con.cursor()
-    show_all = cursoro.execute('SELECT * FROM books').fetchall()
-    con.commit()
+    show_all = [x] + list(cursoro.execute('SELECT * FROM books').fetchall())
+    ask = [False, False]
+    for ind in a:
+        i = list(show_all[ind])
+        i[7] = str(i[7]).strip()
+        i[14] = str(i[14]).strip()
+        if i[7] != '':
+            x[2] += int(i[7])
+        else:
+            ask[0] = True
+        if i[14] != '':
+            x[3] += float(i[14])
+        else:
+            ask[1] = True
+    if ask[0]:
+        x[2] = str(x[2]) + ' ?'
+    if ask[1]:
+        x[3] = str(x[3]) + ' ?'
     con.close()
-    return render_template("index.html", show_all=show_all, db=database)
+    return render_template("index.html", show_all=show_all, db=database, checked=a)
 
 
 @app.route("/db_hudoz", methods=["GET"])
@@ -90,12 +108,6 @@ def change():
     con.commit()
     con.close()
     return render_template("change.html", changing=changing, db=database)
-
-
-@app.route('/book_change/<book_code>')
-def book_change(book_code):
-    return render_template('any_error.html', err=f'Страница изменения книг еще не создана.',
-                           db=database)
 
 
 @app.route("/error", methods=["GET"])
@@ -719,7 +731,7 @@ def book_page(book_code):
         return render_template('any_error.html', db=database, err=f'Не удалось перейти на страницу книги. '
                                                                   f'У этой книги нет штрих-кода')
     cursoro = sqlite3.connect(database).cursor()
-    p = list(cursoro.execute(f'SELECT * FROM books WHERE code={book_code}').fetchall())
+    p = list(cursoro.execute(f"SELECT * FROM books WHERE code={book_code}").fetchall())
     url = f'https://barcode.tec-it.com/barcode.ashx?data={book_code}&code=&multiplebarcodes=false&' \
           f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
           f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
@@ -736,6 +748,68 @@ def book_page(book_code):
         if p[i] is None:
             p[i] = ''
     return render_template('book_page.html', message=p, db=database, img=url)
+
+
+@app.route('/book_change/<book_id>', methods=['GET', 'POST'])
+def book_change(book_id):
+    book_id = int(book_id)
+    con = sqlite3.connect(database)
+    cursoro = con.cursor()
+    p = cursoro.execute(f'SELECT * FROM books WHERE id={book_id}').fetchall()
+    if len(list(p)) == 0:
+        if database == 'BD1.db':
+            return render_template('any_error.html', err=f'Не удалось найти книгу с id={book_id} в базе данных '
+                                                         f'Художественной литературы', db=database)
+        else:
+            return render_template('any_error.html', err=f'Не удалось найти книгу с id={book_id} в базе данных '
+                                                         f'Учебной литературы', db=database)
+    form = NewBook()
+    p = p[0]
+    print(p)
+    if request.method == "GET":
+        form.author.data = p[1]
+        form.name.data = p[2]
+        form.subject.data = p[3]
+        form.clas.data = p[10]
+        form.yeartown.data = p[5]
+        form.publisher.data = p[13]
+        form.number.data = p[6]
+        form.date.data = p[4]
+        form.quantity.data = p[7]
+        form.price.data = p[8]
+        form.sum.data = p[14]
+        form.consignment.data = p[16]
+        form.datecon.data = p[18]
+        form.numberinlist.data = p[12]
+        form.set_1.data = p[15]
+        form.decomission.data = p[11]
+        form.notes.data = p[9]
+        form.code.data = p[17]
+        return render_template('new_book.html', form=form, db=database, message='')
+    if request.method == "POST":
+        con = sqlite3.connect(database)
+        cursoro = con.cursor()
+        cursoro.execute(f"UPDATE books SET author='{form.author.data}', name='{form.name.data}', "
+                        f"subject='{form.subject.data}', clas='{form.clas.data}', yeartown='{form.yeartown.data}', "
+                        f"publisher='{form.publisher.data}', number='{form.number.data}', date='{form.date.data}', "
+                        f"quantity='{form.quantity.data}', price='{form.price.data}', sum='{form.sum.data}', "
+                        f"consignment='{form.consignment.data}', datecon='{form.datecon.data}', "
+                        f"numberinlist='{form.numberinlist.data}', set_1='{form.set_1.data}', "
+                        f"decomission='{form.decomission.data}', notes='{form.notes.data}', code='{form.code.data}' "
+                        f"WHERE id={book_id}")
+        con.commit()
+        con.close()
+        if str(p[17]) != str(form.code.data):
+            if str(form.code.data).strip() not in ['None', '']:
+                 os.remove(f'book_codes/{p[17]}.jpg')
+            url = f'https://barcode.tec-it.com/barcode.ashx?data={form.code.data}&code=&multiplebarcodes=false&' \
+                  f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+                  f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+            filename = f'book_codes/{form.code.data}.jpg'
+            img = urllib.request.urlopen(url).read()
+            with open(filename, 'wb') as file:
+                file.write(img)
+        return redirect(f'/book_page/{form.code.data}')
 
 
 if __name__ == "__main__":

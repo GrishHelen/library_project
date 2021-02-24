@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="wrapper container">
+<form class="wrapper container">
     <nav class="navbar navbar-default">
         <ul class="nav navbar-nav">
             {% if db == 'BD1.db'%}
@@ -32,6 +32,7 @@
     <table class="table table-hover">
         <thead>
         <tr>
+            <th></th>
             <th>№</th>
             <th>Автор</th>
             <th>Название</th>
@@ -54,9 +55,32 @@
         </tr>
         </thead>
         <tbody>
+        <form>
+        <button type="submit" style="background-color: #29c5e6; border: none; color: white; padding: 5px 10px;
+            text-align: center; display: inline-block; font-size: 14px;">Посчитать</button>
         {%for message in show_all %}
         <tr>
-            <th scope="row"><a href="/book_page/{{message[17]}}"  style="color: #1E1E5A">{{message[0]}}</a></th>
+            {% if message[0] < 0 %}
+            <th>{{message[1]}}</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>{{message[2]}}</th>
+            <th></th>
+            <th>{{message[3]}}</th>
+            {% else %}
+            {% if message[0] in checked %}
+            <td><p><input type="checkbox" name="a" value="{{message[0]}}" checked="True"></p></td>
+            {% else %}
+            <td><p><input type="checkbox" name="a" value="{{message[0]}}"></p></td>
+            {% endif %}
+            <th scope="row"><a href="/book_page/{{message[17]}}"  style="color: #373737">{{message[0]}}</a></th>
             <td>{{message[1]}}</td>
             <td><a href="/book_page/{{message[17]}}"  style="color: #1E1E5A">{{message[2]}}</a></td>
             <td>{{message[3]}}</td>
@@ -75,8 +99,10 @@
             <td>{{message[11]}}</td>
             <td>{{message[9]}}</td>
             <td><a href="/book_page/{{message[17]}}"  style="color: #1E1E5A">{{message[17]}}</a></td>
+    {% endif %}
         </tr>
         {% endfor %}
+</form>
         </tbody>
     </table>
 </div>
