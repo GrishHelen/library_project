@@ -94,7 +94,6 @@ def deletebook():
     con = sqlite3.connect(database)
     cursoro = con.cursor()
     table = cursoro.execute('SELECT * FROM books').fetchall()
-    con.commit()
     con.close()
     return render_template("deletebook.html", table=table, db=database)
 
@@ -105,7 +104,6 @@ def change():
     con = sqlite3.connect(database)
     cursoro = con.cursor()
     changing = cursoro.execute('SELECT * FROM books').fetchall()
-    con.commit()
     con.close()
     return render_template("change.html", changing=changing, db=database)
 
@@ -161,6 +159,13 @@ def add_message():
     code = request.form["code"]
     try:
         code = int(code)
+        url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
+              f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+              f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+        filename = f'book_codes/{code}.jpg'
+        img = urllib.request.urlopen(url).read()
+        with open(filename, 'wb') as file:
+            file.write(img)
     except Exception:
         pass
     slovar['code'] = code
@@ -170,7 +175,6 @@ def add_message():
     id = sorted(list(cursoro.execute('SELECT id FROM books').fetchall()))[-1][0] + 1
 
     usual_publishers = list(set(cursoro.execute('SELECT publisher FROM books').fetchall()))
-    con.commit()
     cc = set([i[0] for i in list(cursoro.execute('SELECT code from books').fetchall())])
     if str(code).strip() != '' and code is not None and int(code) in cc:
         return render_template("addbook.html", messages=messages, db=database, s=slovar,
@@ -178,11 +182,11 @@ def add_message():
     if (publisher,) in usual_publishers:
         messages.append(Message(id, author, name, subject, date, yeartown, number, quantity, price, notes, clas,
                                 decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon))
-        cursoro.execute('INSERT INTO books (id, author, name, subject, date, yeartown, number,\
-    quantity, price, notes, clas, decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon)\
-    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        tuple(Message(id, author, name, subject, date, yeartown, number, quantity, price, notes,
-                                      clas, decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon)))
+        cursoro.execute('INSERT INTO books (id, author, name, subject, date, yeartown, number, quantity, price, '
+                        'notes, clas, decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon) '
+                        'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                        tuple(Message(id, author, name, subject, date, yeartown, number, quantity, price, notes, clas,
+                                      decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon)))
         con.commit()
         con.close()
         return redirect(url_for("adbook"))
@@ -203,10 +207,11 @@ def yes_add():
                             M[14], M[15], M[16], M[17], M[18]))
     con = sqlite3.connect(database)
     cursoro = con.cursor()
-    cursoro.execute('SELECT * from books').fetchall()
     cursoro.execute('INSERT INTO books (id, author, name, subject, date, yeartown, number, quantity, price, notes, '
                     'clas, decomission, numberinlist, publisher, sum, set_1, consignment, code, datecon) '
                     'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', tuple(M))
+    con.commit()
+    con.close()
     url = f'https://barcode.tec-it.com/barcode.ashx?data={M[17]}&code=&multiplebarcodes=false&' \
           f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
           f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
@@ -214,8 +219,6 @@ def yes_add():
     img = urllib.request.urlopen(url).read()
     with open(filename, 'wb') as file:
         file.write(img)
-    con.commit()
-    con.close()
     return redirect(url_for("adbook"))
 
 
@@ -229,20 +232,10 @@ def delete():
         p = number.split("-")
         for k in range(int(p[0]), int(p[1]) + 1):
             cursoro.execute("DELETE FROM books WHERE id={}".format(str(k)))
-            con.commit()
-        top = cursoro.execute('SELECT id FROM books').fetchall()[-1][0]
-        for i in range(int(p[1]) + 1, int(top) + 1):
-            cursoro.execute('UPDATE books SET id={} WHERE id={}'.format(i + int(p[0]) - 1 - int(p[1]), i))
-        con.commit()
     else:
         cursoro.execute("DELETE FROM books WHERE id={}".format(number))
-        con.commit()
-        top = cursoro.execute('SELECT id FROM books').fetchall()[-1][0]
-        for i in range(int(number) + 1, int(top) + 1):
-            cursoro.execute('UPDATE books SET id={} WHERE id={}'.format(i - 1, i))
-        con.commit()
-    table = cursoro.execute('SELECT * FROM books').fetchall()
     con.commit()
+    table = cursoro.execute('SELECT * FROM books').fetchall()
     con.close()
     return redirect(url_for("deletebook"))
 
@@ -256,20 +249,10 @@ def dell(number):
         p = number.split("-")
         for k in range(int(p[0]), int(p[1]) + 1):
             cursoro.execute("DELETE FROM books WHERE id={}".format(str(k)))
-            con.commit()
-        top = cursoro.execute('SELECT id FROM books').fetchall()[-1][0]
-        for i in range(int(p[1]) + 1, int(top) + 1):
-            cursoro.execute('UPDATE books SET id={} WHERE id={}'.format(i + int(p[0]) - 1 - int(p[1]), i))
-        con.commit()
     else:
         cursoro.execute("DELETE FROM books WHERE id={}".format(number))
-        con.commit()
-        top = cursoro.execute('SELECT id FROM books').fetchall()[-1][0]
-        for i in range(int(number) + 1, int(top) + 1):
-            cursoro.execute('UPDATE books SET id={} WHERE id={}'.format(i - 1, i))
-        con.commit()
-    table = cursoro.execute('SELECT * FROM books').fetchall()
     con.commit()
+    table = cursoro.execute('SELECT * FROM books').fetchall()
     con.close()
     return deletebook()
 
@@ -330,17 +313,23 @@ def change_it():
     if consignment:
         cursoro.execute('UPDATE books SET consignment = "{}" where id = {}'.format(consignment, id_book))
     if code:
+        url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
+              f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+              f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+        filename = f'book_codes/{code}.jpg'
+        img = urllib.request.urlopen(url).read()
+        with open(filename, 'wb') as file:
+            file.write(img)
         cursoro.execute('UPDATE books SET code = "{}" where id = {}'.format(int(code), id_book))
     if datecon:
         cursoro.execute('UPDATE books SET datecon = "{}" where id = {}'.format(datecon, id_book))
-    con.commit()
     try:
         pr = float(cursoro.execute('SELECT price FROM books WHERE id={}'.format(id_book)).fetchone()[0])
         q = int(cursoro.execute('SELECT quantity FROM books WHERE id={}'.format(id_book)).fetchone()[0])
         cursoro.execute('UPDATE books SET sum = {} where id = {}'.format(pr * q, id_book))
-        con.commit()
     except Exception:
         pass
+    con.commit()
     changing = cursoro.execute('SELECT * FROM books').fetchall()
     con.close()
     return render_template("change.html", changing=changing, messages=messages, db=database)
@@ -426,8 +415,10 @@ def new_teacher():
             id_new += '_1'
         elif len(sp) > 1:
             id_new += '_' + str(sorted([int(i.split('_')[-1]) for i in sp])[-1] + 1)
-        cursoro.execute(
-            f'INSERT INTO numbers (id, fio, position, code) VALUES ("{id_new}", "{fio}", "{form.position.data}", {code})')
+        cursoro.execute(f'INSERT INTO numbers (id, fio, position, code) '
+                        f'VALUES ("{id_new}", "{fio}", "{form.position.data}", {code})')
+        con.commit()
+        con.close()
         url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
               f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
               f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
@@ -435,8 +426,6 @@ def new_teacher():
         img = urllib.request.urlopen(url).read()
         with open(filename, 'wb') as file:
             file.write(img)
-        con.commit()
-        con.close()
         return redirect(f'/person_page/{code}')
 
 
@@ -476,8 +465,10 @@ def new_student():
             id_new += '_1'
         elif len(sp) > 1:
             id_new += '_' + str(sorted([int(i.split('_')[-1]) for i in sp])[-1] + 1)
-        cursoro.execute(
-            f'INSERT INTO numbers (id, fio, position, code) VALUES ("{id_new}", "{fio}", "student", {code})')
+        cursoro.execute(f'INSERT INTO numbers (id, fio, position, code) '
+                        f'VALUES ("{id_new}", "{fio}", "student", {code})')
+        con.commit()
+        con.close()
         url = f'https://barcode.tec-it.com/barcode.ashx?data={code}&code=&multiplebarcodes=false&' \
               f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
               f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
@@ -485,8 +476,6 @@ def new_student():
         img = urllib.request.urlopen(url).read()
         with open(filename, 'wb') as file:
             file.write(img)
-        con.commit()
-        con.close()
         return redirect(f'/person_page/{code}')
 
 
@@ -538,6 +527,7 @@ def take_book():
         con = sqlite3.connect('people.db')
         cursoro = con.cursor()
         p = list(cursoro.execute('SELECT * FROM numbers WHERE code={}'.format(form.person_code.data)).fetchall())
+        con.close()
         if len(p) == 0:
             return render_template('take_give_book.html', form=form, db=database,
                                    message='Такого человека нет в базе данных')
@@ -549,11 +539,8 @@ def take_book():
                                    message='Не удалось найти книгу в базе данных')
         fio = p[0][2]
         today = datetime.datetime.date(datetime.datetime.now())
-        con = sqlite3.connect(database)
-        cursoro = con.cursor()
-        cursoro.execute(
-            f'INSERT INTO history (person_fio, person_code, book, action, date) VALUES ("{fio}", '
-            f'{form.person_code.data}, "{form.book.data}", "принять", "{today}")')
+        cursoro.execute(f'INSERT INTO history (person_fio, person_code, book, action, date) '
+                        f'VALUES ("{fio}", {form.person_code.data}, "{form.book.data}", "принять", "{today}")')
         con.commit()
         con.close()
         return redirect('/giving')
@@ -564,6 +551,7 @@ def person_page(pers_code):
     con = sqlite3.connect('people.db')
     cursoro = con.cursor()
     p = cursoro.execute(f'SELECT * FROM numbers WHERE code={pers_code}').fetchall()
+    con.close()
     if len(p) == 0:
         return render_template('any_error.html', err=f'Не удалось найти пользователя с кодом {pers_code}', db=database)
     id, pos, fio, code = p[0]
@@ -756,6 +744,7 @@ def book_change(book_id):
     con = sqlite3.connect(database)
     cursoro = con.cursor()
     p = cursoro.execute(f'SELECT * FROM books WHERE id={book_id}').fetchall()
+    con.close()
     if len(list(p)) == 0:
         if database == 'BD1.db':
             return render_template('any_error.html', err=f'Не удалось найти книгу с id={book_id} в базе данных '
@@ -787,6 +776,11 @@ def book_change(book_id):
         form.code.data = p[17]
         return render_template('new_book.html', form=form, db=database, message='')
     if request.method == "POST":
+        try:
+            sum = int(form.quantity.data) * float(form.price.data)
+        except Exception:
+            sum = ''
+        form.sum.data = sum
         con = sqlite3.connect(database)
         cursoro = con.cursor()
         cursoro.execute(f"UPDATE books SET author='{form.author.data}', name='{form.name.data}', "
@@ -800,16 +794,20 @@ def book_change(book_id):
         con.commit()
         con.close()
         if str(p[17]) != str(form.code.data):
-            if str(form.code.data).strip() not in ['None', '']:
+            if str(p[17]).strip() not in ['None', '']:
                  os.remove(f'book_codes/{p[17]}.jpg')
-            url = f'https://barcode.tec-it.com/barcode.ashx?data={form.code.data}&code=&multiplebarcodes=false&' \
-                  f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
-                  f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
-            filename = f'book_codes/{form.code.data}.jpg'
-            img = urllib.request.urlopen(url).read()
-            with open(filename, 'wb') as file:
-                file.write(img)
-        return redirect(f'/book_page/{form.code.data}')
+            if str(form.code.data).strip() not in ['None', '']:
+                url = f'https://barcode.tec-it.com/barcode.ashx?data={form.code.data}&code=&multiplebarcodes=false&' \
+                      f'translate-esc=true&unit=Fit&dpi=96&imagetype=Gif&rotation=0&color=%23000000&' \
+                      f'bgcolor=%23ffffff&codepage=Default&qunit=Mm&quiet=0'
+                filename = f'book_codes/{form.code.data}.jpg'
+                img = urllib.request.urlopen(url).read()
+                with open(filename, 'wb') as file:
+                    file.write(img)
+        if str(form.code.data).strip() not in ['None', '']:
+            return redirect(f'/book_page/{form.code.data}')
+        else:
+            return redirect('/change')
 
 
 if __name__ == "__main__":
