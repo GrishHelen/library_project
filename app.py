@@ -735,7 +735,21 @@ def book_page(book_code):
     for i in range(len(p)):
         if p[i] is None:
             p[i] = ''
-    return render_template('book_page.html', message=p, db=database, img=url)
+
+    con = sqlite3.connect(database)
+    cursoro = con.cursor()
+    spisok = [list(i)[2:] for i in cursoro.execute(f'SELECT * from history WHERE book={book_code}').fetchall()]
+    for i in range(len(spisok)):
+        spisok[i][-1] = '.'.join(spisok[i][-1].split('-')[::-1])
+        fio = spisok[i][1].split('_')
+        if '-' in fio:
+            fio.remove('-')
+        spisok[i][1] = ' '.join(fio)
+    con.close()
+    spisok.sort(key=lambda i: -i[0])
+    con.close()
+
+    return render_template('book_page.html', message=p, db=database, img=url, giving=spisok)
 
 
 @app.route('/book_change/<book_id>', methods=['GET', 'POST'])
@@ -754,7 +768,6 @@ def book_change(book_id):
                                                          f'Учебной литературы', db=database)
     form = NewBook()
     p = p[0]
-    print(p)
     if request.method == "GET":
         form.author.data = p[1]
         form.name.data = p[2]

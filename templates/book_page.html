@@ -92,6 +92,31 @@
     <div><a class="btn btn-primary" style="font-size: 12pt; color: white" href="/dell/{{message[0]}}">Удалить</a>
         <a class="btn btn-primary" style="font-size: 12pt; color: white" href="/book_change/{{message[0]}}">Редактировать</a></div>
 
+    <br>
+    <h3>История выдачи этой книги</h3>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Штрих-код человека</th>
+            <th>ФИО человека</th>
+            <th>Вид операции</th>
+            <th>Дата операции</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%for message in giving %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td><a href="/person_page/{{message[0]}}"  style="color: #1E1E5A">{{message[0]}}</a></td>
+            <td><a href="/person_page/{{message[0]}}"  style="color: #1E1E5A">{{message[1]}}</a></td>
+            <td>{{message[2]}}</td>
+            <td>{{message[3]}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
 </div>
 <footer>
 
